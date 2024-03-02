@@ -1,5 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
+import CustomTimePicker from "./CustomTimePicker";
 import "./EventForm.scss";
+
+const hours = [];
+for (let i = 0; i <= 23; i++) {
+  for (let j = 0; j <= 59; j += 15) {
+    hours.push(
+      `${i.toString().padStart(2, "0")}:${j.toString().padStart(2, "0")}`
+    );
+  }
+}
 
 function EventForm() {
   const [eventName, setEventName] = useState("");
@@ -11,6 +21,7 @@ function EventForm() {
   const inputRef = useRef(null);
   const divRef = useRef(null);
   const inputSelectTimeStartRef = useRef(null);
+  const inputSelectTimeEndRef = useRef(null);
 
   const handleClickOutside = (event) => {
     if (
@@ -25,20 +36,10 @@ function EventForm() {
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
-
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [inputRef, divRef]);
-
-  const hours = [];
-  for (let i = 0; i <= 23; i++) {
-    for (let j = 0; j <= 59; j += 15) {
-      hours.push(
-        `${i.toString().padStart(2, "0")}:${j.toString().padStart(2, "0")}`
-      );
-    }
-  }
 
   const handleTimeChangeFromDropdown = (event, dropdownTime) => {
     setStartHour(dropdownTime);
@@ -54,16 +55,7 @@ function EventForm() {
     input.current.classList.add("secondary-input__opened");
   };
 
-  const handleInputBlur = (event, secondaryInput) => {
-    const value = event.target.value;
-    if (
-      value.match(/^(?:[0-1]\d|2[0-3]):(?:[0-5][0-9])$/) &&
-      value <= "23:45"
-    ) {
-      setStartHour(value);
-      return;
-    }
-
+  const handleInputBlur = (event) => {
     const newTime = event.target.value
       .replace(/[^0-9]/g, "")
       .replaceAll(":", "");
@@ -73,19 +65,18 @@ function EventForm() {
       transformedTime = `0${newTime}:00`;
     } else if (parseInt(newTime) > 9 && parseInt(newTime) <= 12) {
       transformedTime = `${newTime}:00`;
-    } else if (newTime.length === 3 && parseInt(newTime) < 1000) {
+    } else if (newTime.length === 3) {
       transformedTime = `0${newTime.substring(0, 1)}:${newTime.substring(
         1,
         3
       )}`;
-    } else if (parseInt(newTime) > 1000) {
+    } else if (newTime.length >= 4) {
       transformedTime = `${newTime.substring(0, 2)}:${newTime.substring(2, 4)}`;
     }
-    console.log(transformedTime);
-    // Validate the transformed time format (HH:MM) and range (00:00 - 23:45)
+
     const isValid =
       transformedTime.match(/^(?:[0-1]\d|2[0-3]):(?:[0-5][0-9])$/) &&
-      transformedTime <= "23:45";
+      transformedTime <= "23:59";
     if (isValid) {
       setStartHour(transformedTime);
     } else {
@@ -128,7 +119,7 @@ function EventForm() {
       </div>
       <div className="input-group">
         <label>Time (HH:MM):</label>
-        <div className="time-inputs">
+        <div className="time-inputs custom-time-picker">
           <input
             type="text"
             value={startHour}
@@ -157,6 +148,10 @@ function EventForm() {
           </div>
         </div>
       </div>
+      <CustomTimePicker
+        selectedTime={startHour}
+        setSelectedTime={setStartHour}
+      />
       <div className="input-group">
         <label>End Hour (HH:MM):</label>
         <input
@@ -177,6 +172,7 @@ function EventForm() {
           ))}
         </select>
       </div>
+      .
       <div className="input-group">
         <label htmlFor="place">Place:</label>
         <input
