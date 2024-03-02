@@ -1,9 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./CustomTimePicker.scss";
 
-const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
+const CustomTimePicker = ({
+  selectedTime,
+  setSelectedTime,
+  formValidations,
+  inputName,
+}) => {
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const isFocused = useRef(false);
+  const [timeBeforeFocus, setTimeBeforeFocus] = useState();
 
   const hours = [];
   for (let i = 0; i <= 23; i++) {
@@ -18,7 +25,8 @@ const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
     const handleClickOutside = (event) => {
       if (
         !inputRef.current.contains(event.target) &&
-        !dropdownRef.current.contains(event.target)
+        !dropdownRef.current.contains(event.target) &&
+        !isFocused.current
       ) {
         dropdownRef.current.classList.remove("secondary-input__opened");
       }
@@ -27,31 +35,96 @@ const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [inputRef]);
 
-  const handleTimeChange = (event) => {
-    const newTime = event.target.value;
-    setSelectedTime(newTime);
+  const moveSelectBoxAccordingToWrittenInput = (time) => {
+    // const hourElement = dropdownRef.current.querySelector(`[value="12:00"]`);
+    if (!time) return;
+
+    const parsedTime = parseTimeToFormat(time);
+    const hourMinutes = parsedTime.substring(3, 5);
+    const timeDivisible = Math.floor(parseInt(hourMinutes) / 15);
+    const parsedTimeForValue =
+      parsedTime.substring(0, 3) +
+      (timeDivisible === 0 ? "00" : timeDivisible * 15);
+
+    const hourElement = dropdownRef.current.querySelector(
+      `[value="${parsedTimeForValue}"]`
+    );
+
+    dropdownRef.current
+      .querySelector(".scrolled-to")
+      ?.classList.remove("scrolled-to");
+    hourElement?.classList.add("scrolled-to");
+
+    hourElement?.scrollIntoView({
+      block: "center",
+      inline: "center",
+    });
+    console.log(hourElement);
   };
 
-  const handleTimeSelection = (hour) => {
-    setSelectedTime(hour);
+  const handleOnInputChange = (event) => {
+    const newTime = event.target.value;
+    setSelectedTime(newTime);
+    moveSelectBoxAccordingToWrittenInput(newTime);
+    dropdownRef.current.classList.add("secondary-input__opened");
+  };
+
+  const handleOnClickSelect = (hour) => {
+    const isValidInForm = formValidations(inputName, hour);
+    if (isValidInForm) {
+      setSelectedTime(hour);
+    }
     dropdownRef.current.classList.remove("secondary-input__opened");
   };
 
-  const handleTimeInputFocus = () => {
-    dropdownRef.current.classList.toggle("secondary-input__opened");
+  const handleOnClick = () => {
+    dropdownRef.current.classList.add("secondary-input__opened");
   };
 
-  const handleInputBlur = (event) => {
-    const newTime = event.target.value
-      .replace(/[^0-9]/g, "")
-      .replaceAll(":", "");
+  const handleOnFocus = () => {
+    setTimeBeforeFocus(selectedTime);
+    isFocused.current = true;
+    dropdownRef.current.classList.add("secondary-input__opened");
+    moveSelectBoxAccordingToWrittenInput(selectedTime);
+  };
+
+  const handleKeyUp = (event) => {
+    if (event.keyCode === 13) {
+      handleWrittenInputValidation(event);
+      dropdownRef.current.classList.remove("secondary-input__opened");
+    }
+  };
+
+  const handleOnBlur = (event) => {
+    handleWrittenInputValidation(event);
+  };
+
+  const parseTimeToFormat = (time) => {
+    let newTime = time.replace(/[^0-9]/g, "").replaceAll(":", "");
     let transformedTime = newTime;
+
+    if (
+      newTime.length >= 2 &&
+      newTime.length < 4 &&
+      newTime.substring(0, 1) === "0"
+    ) {
+      newTime = newTime.substring(1, newTime.length);
+    }
 
     if (parseInt(newTime) <= 9) {
       transformedTime = `0${newTime}:00`;
-    } else if (parseInt(newTime) > 9 && parseInt(newTime) <= 12) {
+    } else if (parseInt(newTime) > 9 && parseInt(newTime) <= 23) {
       transformedTime = `${newTime}:00`;
-    } else if (newTime.length === 3) {
+    } else if (newTime.length === 2 && parseInt(newTime.substring(1, 2)) < 6) {
+      transformedTime = `0${newTime.substring(0, 1)}:${newTime.substring(
+        1,
+        2
+      )}0`;
+      console.log(transformedTime);
+    } else if (
+      newTime.length === 3 &&
+      transformedTime.substring(0, 1) !== "0"
+    ) {
       transformedTime = `0${newTime.substring(0, 1)}:${newTime.substring(
         1,
         3
@@ -59,14 +132,23 @@ const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
     } else if (newTime.length >= 4) {
       transformedTime = `${newTime.substring(0, 2)}:${newTime.substring(2, 4)}`;
     }
+    return transformedTime;
+  };
+
+  const handleWrittenInputValidation = (event) => {
+    const transformedTime = parseTimeToFormat(event.target.value);
 
     const isValid =
       transformedTime.match(/^(?:[0-1]\d|2[0-3]):(?:[0-5][0-9])$/) &&
       transformedTime <= "23:59";
-    if (isValid) {
+
+    isFocused.current = false;
+
+    const isValidInForm = formValidations(inputName, transformedTime);
+    if (isValidInForm && isValid) {
       setSelectedTime(transformedTime);
     } else {
-      setSelectedTime("");
+      setSelectedTime(timeBeforeFocus);
     }
   };
 
@@ -76,9 +158,11 @@ const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
         type="text"
         value={selectedTime}
         ref={inputRef}
-        onChange={handleTimeChange}
-        onFocus={handleTimeInputFocus}
-        onBlur={handleInputBlur}
+        onChange={handleOnInputChange}
+        onClick={handleOnClick}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        onKeyUp={handleKeyUp}
         placeholder="00:00"
       />
       <div className="time-dropdown secondary-input" ref={dropdownRef}>
@@ -86,7 +170,7 @@ const CustomTimePicker = ({ selectedTime, setSelectedTime }) => {
           <label
             key={hour}
             value={hour}
-            onClick={() => handleTimeSelection(hour)}
+            onClick={() => handleOnClickSelect(hour)}
           >
             {hour}
           </label>

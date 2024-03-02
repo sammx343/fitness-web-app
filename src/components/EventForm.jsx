@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import CustomTimePicker from "./CustomTimePicker";
 import "./EventForm.scss";
 
@@ -11,6 +11,9 @@ for (let i = 0; i <= 23; i++) {
   }
 }
 
+const START_INPUT_NAME = "start";
+const END_INPUT_NAME = "end";
+
 function EventForm() {
   const [eventName, setEventName] = useState("");
   const [startHour, setStartHour] = useState("");
@@ -18,75 +21,24 @@ function EventForm() {
   const [place, setPlace] = useState("");
   const [isWeeklyRepeating, setIsWeeklyRepeating] = useState(false);
 
-  const inputRef = useRef(null);
-  const divRef = useRef(null);
-  const inputSelectTimeStartRef = useRef(null);
-  const inputSelectTimeEndRef = useRef(null);
-
-  const handleClickOutside = (event) => {
-    if (
-      !inputSelectTimeStartRef.current.contains(event?.target) &&
-      !inputRef.current.contains(event?.target)
-    ) {
-      inputSelectTimeStartRef.current.classList.remove(
-        "secondary-input__opened"
-      );
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [inputRef, divRef]);
-
-  const handleTimeChangeFromDropdown = (event, dropdownTime) => {
-    setStartHour(dropdownTime);
-    inputSelectTimeStartRef.current.classList.remove("secondary-input__opened");
-  };
-
-  const handleTimeChange = (event) => {
-    const newTime = event.target.value;
-    setStartHour(newTime);
-  };
-
-  const handleTimeInputFocused = (input) => {
-    input.current.classList.add("secondary-input__opened");
-  };
-
-  const handleInputBlur = (event) => {
-    const newTime = event.target.value
-      .replace(/[^0-9]/g, "")
-      .replaceAll(":", "");
-    let transformedTime = newTime;
-
-    if (parseInt(newTime) <= 9) {
-      transformedTime = `0${newTime}:00`;
-    } else if (parseInt(newTime) > 9 && parseInt(newTime) <= 12) {
-      transformedTime = `${newTime}:00`;
-    } else if (newTime.length === 3) {
-      transformedTime = `0${newTime.substring(0, 1)}:${newTime.substring(
-        1,
-        3
-      )}`;
-    } else if (newTime.length >= 4) {
-      transformedTime = `${newTime.substring(0, 2)}:${newTime.substring(2, 4)}`;
+  const formValidations = (name, time) => {
+    if (name === START_INPUT_NAME && endHour) {
+      if (time >= endHour) {
+        console.log("false");
+        return false;
+      }
     }
 
-    const isValid =
-      transformedTime.match(/^(?:[0-1]\d|2[0-3]):(?:[0-5][0-9])$/) &&
-      transformedTime <= "23:59";
-    if (isValid) {
-      setStartHour(transformedTime);
-    } else {
-      setStartHour("");
+    if (name === END_INPUT_NAME && startHour) {
+      if (startHour >= time) {
+        return false;
+      }
     }
+
+    return true;
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-
     // Send the event data to your backend API or logic here
     console.log({
       eventName,
@@ -105,7 +57,7 @@ function EventForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       <h2>Create Event</h2>
       <div className="input-group">
         <label htmlFor="eventName">Event Name:</label>
@@ -119,58 +71,22 @@ function EventForm() {
       </div>
       <div className="input-group">
         <label>Time (HH:MM):</label>
-        <div className="time-inputs custom-time-picker">
-          <input
-            type="text"
-            value={startHour}
-            ref={inputRef}
-            onChange={handleTimeChange}
-            onFocus={() => handleTimeInputFocused(inputSelectTimeStartRef)}
-            onBlur={(event) => handleInputBlur(event, inputSelectTimeStartRef)}
-            placeholder="00:00"
-            required
-          />
-          <div
-            className="time-dropdown secondary-input"
-            ref={inputSelectTimeStartRef}
-          >
-            {hours.map((hour) => (
-              <label
-                key={hour}
-                value={hour}
-                onClick={(e) => {
-                  handleTimeChangeFromDropdown(e, hour);
-                }}
-              >
-                {hour}
-              </label>
-            ))}
-          </div>
-        </div>
+
+        <CustomTimePicker
+          selectedTime={startHour}
+          setSelectedTime={setStartHour}
+          formValidations={formValidations}
+          inputName={START_INPUT_NAME}
+        />
       </div>
-      <CustomTimePicker
-        selectedTime={startHour}
-        setSelectedTime={setStartHour}
-      />
       <div className="input-group">
         <label>End Hour (HH:MM):</label>
-        <input
-          type="text"
-          value={endHour}
-          onChange={(e) => setEndHour(e.target.value)}
-          placeholder="00:00"
-          required
+        <CustomTimePicker
+          selectedTime={endHour}
+          setSelectedTime={setEndHour}
+          formValidations={formValidations}
+          inputName={END_INPUT_NAME}
         />
-        <select
-          onChange={(e) => setEndHour(e.target.value)}
-          className={"secondary-input"}
-        >
-          {hours.map((hour) => (
-            <option key={hour} value={hour}>
-              {hour}
-            </option>
-          ))}
-        </select>
       </div>
       .
       <div className="input-group">
@@ -180,7 +96,6 @@ function EventForm() {
           id="place"
           value={place}
           onChange={(e) => setPlace(e.target.value)}
-          required
         />
       </div>
       <div className="input-group">
@@ -191,10 +106,12 @@ function EventForm() {
             checked={isWeeklyRepeating}
             onChange={(e) => setIsWeeklyRepeating(e.target.checked)}
           />
-          Weekly Repeating
+          Evento Semanal
         </label>
       </div>
-      <button type="submit">Create Event</button>
+      <button type="button" onClick={() => handleSubmit()}>
+        Create Event
+      </button>
     </form>
   );
 }

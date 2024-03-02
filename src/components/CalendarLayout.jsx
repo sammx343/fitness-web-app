@@ -30,7 +30,6 @@ const CalendarLayout = () => {
     const divHeight = event.target.offsetHeight;
     const distanceToTopPercentage = offsetY / divHeight;
     let half = distanceToTopPercentage < 0.5 ? ":00" : ":30";
-    console.log(getDateOfWeekDay(day), hour + half);
     setShouldOpenModal(true);
   }
 
