@@ -1,0 +1,44 @@
+.week-calendar {
+  .week-controls {
+    display: flex;
+    align-items: center;
+
+    .week-control-arrow {
+      font-size: 30px;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 2px 10px;
+      border-radius: 50%;
+      background: gray;
+    }
+
+    p {
+      font-weight: 900;
+      font-size: 20px;
+      text-transform: capitalize;
+      padding: 0px 10px;
+    }
+  }
+  .week-days {
+    display: grid;
+    grid-template-columns: 40px repeat(7, 1fr);
+  }
+
+  .week-day {
+    border-right: 1px solid black;
+  }
+
+  .day-hour {
+    border-bottom: 1px solid black;
+    min-height: 50px;
+    cursor: pointer;
+  }
+
+  .day-header {
+    border-bottom: 1px solid black;
+    min-height: 50px;
+    &__highlighted {
+      background: linear-gradient(0deg, blue 0%, transparent 100%);
+    }
+  }
+}

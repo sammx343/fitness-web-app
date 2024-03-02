@@ -1,7 +1,6 @@
 import React from "react";
-import BusinessList from "../components/BusinessList";
-import MySubscriptions from "../components/MySubscriptions";
-
+import StudentsHome from "../components/StudentsHome";
+import TeachersHome from "../components/TeachersHome";
 import { useAuth } from "../auth/AuthContext";
 
 const Home = () => {
@@ -9,8 +8,8 @@ const Home = () => {
   return (
     <div>
       <h1> Home </h1>
-      {user && <MySubscriptions />}
-      {user && <BusinessList />}
+      {user?.role === "student" && <StudentsHome />}
+      {user?.role === "teacher" && <TeachersHome />}
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { signUp } from "../services/auth";
 import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./SignUp.scss";
 import "../styles/buttons.scss";
 
 const SignUpForm = () => {
   const { signIn } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "Sebastian",
     lastName: "Mayor",
@@ -13,7 +15,7 @@ const SignUpForm = () => {
     email: "naitsabes29@gmail.com",
     phone: "3017773031",
     address: "cra 23 no.50-27",
-    userType: "student",
+    role: "student",
   });
 
   const handleChange = (e) => {
@@ -37,10 +39,11 @@ const SignUpForm = () => {
           email: "",
           phone: "",
           address: "",
-          userType: "student",
+          role: "student",
         });
 
-        signIn(formData);
+        signIn(res.data.user);
+        navigate("/");
       })
       .catch((err) => {
         console.log(err);
@@ -51,7 +54,7 @@ const SignUpForm = () => {
     <form onSubmit={handleSubmit} className="sign-up">
       <div className="sign-up-container">
         <label>
-          First Name:
+          Nombres:
           <input
             type="text"
             name="firstName"
@@ -62,7 +65,7 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          Last Name:
+          Apellidos:
           <input
             type="text"
             name="lastName"
@@ -73,7 +76,7 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          Password:
+          Contraseña:
           <input
             type="password"
             name="password"
@@ -84,7 +87,7 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          Email:
+          Correo eléctronico:
           <input
             type="email"
             name="email"
@@ -95,7 +98,7 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          Phone:
+          Teléfono:
           <input
             type="tel"
             name="phone"
@@ -106,7 +109,7 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          Address:
+          Dirección:
           <input
             name="address"
             value={formData.address}
@@ -116,32 +119,32 @@ const SignUpForm = () => {
         </label>
 
         <label>
-          User Type:
+          Rol:
           <div>
             <label>
               <input
                 type="radio"
-                name="userType"
+                name="role"
                 value="teacher"
-                checked={formData.userType === "teacher"}
+                checked={formData.role === "teacher"}
                 onChange={handleChange}
               />
-              Teacher
+              Profesor
             </label>
             <label>
               <input
                 type="radio"
-                name="userType"
+                name="role"
                 value="student"
-                checked={formData.userType === "student"}
+                checked={formData.role === "student"}
                 onChange={handleChange}
               />
-              Student
+              Estudiante
             </label>
           </div>
         </label>
         <button type="submit" className="btn btn-primary">
-          Sign Up
+          Registrate!
         </button>
       </div>
     </form>

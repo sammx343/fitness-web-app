@@ -1,6 +1,14 @@
 import axios from "axios";
 import config from "../config";
 
+const createBusiness = (params) => {
+  try {
+    return axios.post(`${config.apiUrl}/businesses`, params);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const getBusinessList = () => {
   try {
     return axios.get(`${config.apiUrl}/businesses/list`);
@@ -17,4 +25,4 @@ const getBusinessById = (id) => {
   }
 };
 
-export { getBusinessList, getBusinessById };
+export { getBusinessList, getBusinessById, createBusiness };

@@ -1,0 +1,6 @@
+{
+  "home": "/",
+  "businesses": {
+    "create": "/businesses/create"
+  }
+}

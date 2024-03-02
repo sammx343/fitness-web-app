@@ -5,17 +5,22 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import Home from "./pages/Home";
 import HomeNavigation from "./components/HomeNavigation";
-import { AuthProvider, useAuth } from "./auth/AuthContext";
+import { AuthProvider } from "./auth/AuthContext";
 import UserProfile from "./pages/UserProfile";
 import PrivateRoute from "./auth/PrivateRoute";
+import TeachersRoute from "./auth/TeachersRoute";
 import NotFound from "./pages/NotFound";
 import BusinessProfile from "./pages/BusinessProfile";
+import CreateBusiness from "./pages/CreateBusiness";
+import routes from "./AppRoutes.json";
 
 function App() {
   return (
     <AuthProvider>
-      <h1>Fitness App</h1>
       <BrowserRouter>
+        <h1>
+          <Link to={`/`}>Fitness App</Link>
+        </h1>
         <HomeNavigation></HomeNavigation>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -31,6 +36,14 @@ function App() {
           />
 
           <Route path="/businesses/:id" element={<BusinessProfile />} />
+          <Route
+            path={routes.businesses.create}
+            element={
+              <TeachersRoute>
+                <CreateBusiness />
+              </TeachersRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
