@@ -1,11 +1,10 @@
 import React from "react";
-import "./App.css";
 import SignUp from "./pages/SignUp";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthContext";
 import SignIn from "./pages/SignIn";
 import Home from "./pages/Home";
 import HomeNavigation from "./components/HomeNavigation";
-import { AuthProvider } from "./auth/AuthContext";
 import UserProfile from "./pages/UserProfile";
 import PrivateRoute from "./auth/PrivateRoute";
 import TeachersRoute from "./auth/TeachersRoute";
@@ -18,9 +17,6 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <h1>
-          <Link to={`/`}>Fitness App</Link>
-        </h1>
         <HomeNavigation></HomeNavigation>
         <Routes>
           <Route path="/" element={<Home />} />

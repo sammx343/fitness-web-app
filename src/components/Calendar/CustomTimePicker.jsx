@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./CustomTimePicker.scss";
 
+const hours = [];
+for (let i = 0; i <= 23; i++) {
+  for (let j = 0; j <= 59; j += 15) {
+    hours.push(
+      `${i.toString().padStart(2, "0")}:${j.toString().padStart(2, "0")}`
+    );
+  }
+}
+
 const CustomTimePicker = ({
   selectedTime,
   setSelectedTime,
@@ -12,16 +21,8 @@ const CustomTimePicker = ({
   const isFocused = useRef(false);
   const [timeBeforeFocus, setTimeBeforeFocus] = useState();
 
-  const hours = [];
-  for (let i = 0; i <= 23; i++) {
-    for (let j = 0; j <= 59; j += 15) {
-      hours.push(
-        `${i.toString().padStart(2, "0")}:${j.toString().padStart(2, "0")}`
-      );
-    }
-  }
-
   useEffect(() => {
+    //Closes hours div when clicked outside
     const handleClickOutside = (event) => {
       if (
         !inputRef.current.contains(event.target) &&
@@ -36,7 +37,6 @@ const CustomTimePicker = ({
   }, [inputRef]);
 
   const moveSelectBoxAccordingToWrittenInput = (time) => {
-    // const hourElement = dropdownRef.current.querySelector(`[value="12:00"]`);
     if (!time) return;
 
     const parsedTime = parseTimeToFormat(time);
@@ -59,7 +59,6 @@ const CustomTimePicker = ({
       block: "center",
       inline: "center",
     });
-    console.log(hourElement);
   };
 
   const handleOnInputChange = (event) => {
@@ -120,7 +119,6 @@ const CustomTimePicker = ({
         1,
         2
       )}0`;
-      console.log(transformedTime);
     } else if (
       newTime.length === 3 &&
       transformedTime.substring(0, 1) !== "0"
@@ -176,6 +174,7 @@ const CustomTimePicker = ({
           </label>
         ))}
       </div>
+      <p style={{color : 'red'}}>Hora final no puede ser menor a hora inicial</p>
     </div>
   );
 };

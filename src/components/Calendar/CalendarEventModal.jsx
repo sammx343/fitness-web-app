@@ -2,7 +2,7 @@ import React from "react";
 import "./CalendarEventModal.scss";
 import EventForm from "./EventForm";
 
-const CalendarEventModal = ({ setShouldOpenModal }) => {
+const CalendarEventModal = ({ setShouldOpenModal, clickedHourDate}) => {
   return (
     <div className="calendar-event-modal">
       <div
@@ -11,7 +11,7 @@ const CalendarEventModal = ({ setShouldOpenModal }) => {
       ></div>
       <div className="calendar-event-modal__content">
         <h1>Calendar Event Modal</h1>
-        <EventForm />
+        <EventForm clickedHourDate={clickedHourDate}/>
       </div>
     </div>
   );

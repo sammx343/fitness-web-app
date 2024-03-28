@@ -1,0 +1,16 @@
+.home-navigation{
+    display: flex;
+    &__menu{
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        &-item{
+            padding: 10px 20px;
+        }
+    }
+
+    h1{
+        margin: 10px 0;
+    }
+}

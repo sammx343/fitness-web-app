@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBusinessById } from "../services/businesses";
-import CalendarLayout from "../components/CalendarLayout";
+import CalendarLayout from "../components/Calendar/CalendarLayout";
 import { useAuth } from "../auth/AuthContext";
+import "./BusinessProfile.scss";
 
 const BusinessProfile = () => {
   const { id } = useParams();
@@ -24,12 +25,16 @@ const BusinessProfile = () => {
   }
 
   return (
-    <div>
-      <h2>{business.name}</h2>
-      <p>Direccion: {business.address}</p>
-      <p>Email: {business.email}</p>
-      <CalendarLayout />
-    </div>
+    <main className="business-profile">
+      <div className="business-profile__main-info">
+        <h2>{business.name}</h2>
+        <p>Direccion: {business.address}</p>
+        <p>Email: {business.email}</p>
+      </div>
+      <div className="business-profile__calendar">
+        <CalendarLayout/>
+      </div>
+    </main>
   );
 };
 

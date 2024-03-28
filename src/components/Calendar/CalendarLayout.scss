@@ -22,6 +22,8 @@
   .week-days {
     display: grid;
     grid-template-columns: 40px repeat(7, 1fr);
+    max-height: 80vh;
+    overflow-y: scroll;
   }
 
   .week-day {
@@ -30,15 +32,34 @@
 
   .day-hour {
     border-bottom: 1px solid black;
-    min-height: 50px;
+    min-height: 35px;
     cursor: pointer;
   }
 
   .day-header {
     border-bottom: 1px solid black;
-    min-height: 50px;
+    min-height: 30px;
     &__highlighted {
       background: linear-gradient(0deg, blue 0%, transparent 100%);
+    }
+  }
+  .current-hour{
+    position: relative;
+    &__pointer{
+      position: absolute;
+      width: 100%;
+      height: 2.5px;
+      background-color: #ea4335;
+      &:after{
+        content: "";
+        display: block;
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background-color: #ea4335;
+      }
     }
   }
 }
