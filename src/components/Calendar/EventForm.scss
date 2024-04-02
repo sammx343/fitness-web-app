@@ -1,32 +1,17 @@
 .input-group {
   display: flex;
   justify-content: space-between;
+  &__right{
+    margin-left: 50px;
+    width: 200px;
+  }
 
-  .time-inputs {
-    position: relative;
+  input[type=text] {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-    .secondary-input {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      transform: translateY(25px);
-      background: white;
-      border: 1px solid black;
-      width: 100%;
-
-      &__opened {
-        display: flex;
-        flex-direction: column;
-        height: 200px;
-        overflow-y: scroll;
-
-        >*:hover {
-          cursor: pointer;
-          background-color: aqua;
-        }
-      }
-    }
+  p {
+    margin: 0;
   }
 }

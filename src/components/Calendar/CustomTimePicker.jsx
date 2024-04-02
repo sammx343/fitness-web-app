@@ -13,12 +13,13 @@ for (let i = 0; i <= 23; i++) {
 const CustomTimePicker = ({
   selectedTime,
   setSelectedTime,
-  formValidations,
+  parentFormValidation,
   inputName,
 }) => {
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
   const isFocused = useRef(false);
+  const [currentError, setCurrentError] = useState("");
   const [timeBeforeFocus, setTimeBeforeFocus] = useState();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const CustomTimePicker = ({
         !dropdownRef.current.contains(event.target) &&
         !isFocused.current
       ) {
-        dropdownRef.current.classList.remove("secondary-input__opened");
+        dropdownRef.current.classList.remove("time-dropdown__opened");
       }
     };
     document.addEventListener("click", handleClickOutside);
@@ -61,36 +62,48 @@ const CustomTimePicker = ({
     });
   };
 
+  const getAndWriteCurrentFormError = (inputName, hour) => {
+    const formValidationObject = parentFormValidation(inputName, hour);
+    
+    if(formValidationObject.error){
+      setCurrentError(formValidationObject.error);
+    } else{
+      setCurrentError("");
+    }
+    const currentError = !!formValidationObject.error;
+    return currentError;
+  };
+
   const handleOnInputChange = (event) => {
     const newTime = event.target.value;
     setSelectedTime(newTime);
     moveSelectBoxAccordingToWrittenInput(newTime);
-    dropdownRef.current.classList.add("secondary-input__opened");
+    dropdownRef.current.classList.add("time-dropdown__opened");
   };
 
   const handleOnClickSelect = (hour) => {
-    const isValidInForm = formValidations(inputName, hour);
-    if (isValidInForm) {
+    const formHasErrors = getAndWriteCurrentFormError(inputName, hour);
+    if (!formHasErrors) {
       setSelectedTime(hour);
     }
-    dropdownRef.current.classList.remove("secondary-input__opened");
+    dropdownRef.current.classList.remove("time-dropdown__opened");
   };
 
   const handleOnClick = () => {
-    dropdownRef.current.classList.add("secondary-input__opened");
+    dropdownRef.current.classList.add("time-dropdown__opened");
   };
 
   const handleOnFocus = () => {
     setTimeBeforeFocus(selectedTime);
     isFocused.current = true;
-    dropdownRef.current.classList.add("secondary-input__opened");
+    dropdownRef.current.classList.add("time-dropdown__opened");
     moveSelectBoxAccordingToWrittenInput(selectedTime);
   };
 
   const handleKeyUp = (event) => {
     if (event.keyCode === 13) {
       handleWrittenInputValidation(event);
-      dropdownRef.current.classList.remove("secondary-input__opened");
+      dropdownRef.current.classList.remove("time-dropdown__opened");
     }
   };
 
@@ -136,14 +149,14 @@ const CustomTimePicker = ({
   const handleWrittenInputValidation = (event) => {
     const transformedTime = parseTimeToFormat(event.target.value);
 
-    const isValid =
+    const isTimeValid =
       transformedTime.match(/^(?:[0-1]\d|2[0-3]):(?:[0-5][0-9])$/) &&
       transformedTime <= "23:59";
 
     isFocused.current = false;
 
-    const isValidInForm = formValidations(inputName, transformedTime);
-    if (isValidInForm && isValid) {
+    const formHasErrors = getAndWriteCurrentFormError(inputName, transformedTime);
+    if (!formHasErrors && isTimeValid) {
       setSelectedTime(transformedTime);
     } else {
       setSelectedTime(timeBeforeFocus);
@@ -151,7 +164,7 @@ const CustomTimePicker = ({
   };
 
   return (
-    <div className="time-inputs custom-time-picker">
+    <div className="custom-time-picker">
       <input
         type="text"
         value={selectedTime}
@@ -163,7 +176,7 @@ const CustomTimePicker = ({
         onKeyUp={handleKeyUp}
         placeholder="00:00"
       />
-      <div className="time-dropdown secondary-input" ref={dropdownRef}>
+      <div className="time-dropdown" ref={dropdownRef}>
         {hours.map((hour) => (
           <label
             key={hour}
@@ -174,7 +187,10 @@ const CustomTimePicker = ({
           </label>
         ))}
       </div>
-      <p style={{color : 'red'}}>Hora final no puede ser menor a hora inicial</p>
+      {
+        currentError &&
+        <p style={{ color: 'red' }}>{currentError}</p>
+      }
     </div>
   );
 };
