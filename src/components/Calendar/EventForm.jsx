@@ -21,39 +21,12 @@ function EventForm({ clickedHourDate }) {
   const [place, setPlace] = useState("");
   const [isWeeklyRepeating, setIsWeeklyRepeating] = useState(false);
 
+  //TODO: Add possible validations to time from the parent component. 
+  //If there are none this method and every call should be deleted
+  //check again when on production!
   const formValidationObject = (name, time) => {
-    const isSelectedLowerHour = selectedLowerHour(name, time);
-    if(isSelectedLowerHour.error) return isSelectedLowerHour;
-
-    const isSelectedHigherHour = selectedHigherHour(name, time);
-    if(isSelectedHigherHour.error) return isSelectedHigherHour;
-
     return {};
   };
-
-  function selectedLowerHour(name, time){
-    if (name === START_INPUT_NAME && endHour) {
-      if (time >= endHour) {
-        return {
-          error: 'La hora inicial no puede ser mayor a la hora final'
-        };
-      }
-    }
-    return {
-    }
-  }
-
-  function selectedHigherHour(name, time){
-    if (name === END_INPUT_NAME && startHour) {
-      if (startHour >= time) {
-        return {
-          error: 'La hora final no puede ser menor a la hora inicial'
-        };
-      }
-    }
-    return {
-    }
-  }
 
   function parsedClickedHourDate(date) {
     const currentHours = date.getHours();
