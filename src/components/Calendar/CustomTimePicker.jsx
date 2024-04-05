@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./CustomTimePicker.scss";
 
+
+const TIME_DIVISIVILITY_IN_MINUTES = 15;
 const hours = [];
 for (let i = 0; i <= 23; i++) {
-  for (let j = 0; j <= 59; j += 15) {
+  for (let j = 0; j <= 59; j += TIME_DIVISIVILITY_IN_MINUTES) {
     hours.push(
       `${i.toString().padStart(2, "0")}:${j.toString().padStart(2, "0")}`
     );
@@ -41,10 +43,10 @@ const CustomTimePicker = ({
 
     const parsedTime = parseTimeToFormat(time);
     const hourMinutes = parsedTime.substring(3, 5);
-    const timeDivisible = Math.floor(parseInt(hourMinutes) / 15);
+    const timeDivisible = Math.floor(parseInt(hourMinutes) / TIME_DIVISIVILITY_IN_MINUTES);
     const parsedTimeForValue =
       parsedTime.substring(0, 3) +
-      (timeDivisible === 0 ? "00" : timeDivisible * 15);
+      (timeDivisible === 0 ? "00" : timeDivisible * TIME_DIVISIVILITY_IN_MINUTES);
 
     const hourElement = dropdownRef.current.querySelector(
       `[value="${parsedTimeForValue}"]`
