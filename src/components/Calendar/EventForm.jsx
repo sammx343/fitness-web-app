@@ -14,54 +14,35 @@ for (let i = 0; i <= 23; i++) {
 const START_INPUT_NAME = "start";
 const END_INPUT_NAME = "end";
 
-function EventForm({clickedHourDate}) {
+function EventForm({ clickedHourDate }) {
   const [eventName, setEventName] = useState("");
   const [startHour, setStartHour] = useState(parsedClickedHourDate(clickedHourDate));
   const [endHour, setEndHour] = useState(createClickedHourDateEnd(clickedHourDate));
   const [place, setPlace] = useState("");
   const [isWeeklyRepeating, setIsWeeklyRepeating] = useState(false);
 
-  const formValidations = (name, time) => {
-    if (name === START_INPUT_NAME && endHour) {
-      if (time >= endHour) {
-        return false;
-      }
-    }
-
-    if (name === END_INPUT_NAME && startHour) {
-      if (startHour >= time) {
-        return false;
-      }
-    }
-
-    return true;
+  //TODO: Add possible validations to time from the parent component. 
+  //If there are none this method and every call should be deleted
+  //check again when on production!
+  const formValidationObject = (name, time) => {
+    return {};
   };
 
-  function parsedClickedHourDate(date){
+  function parsedClickedHourDate(date) {
     const currentHours = date.getHours();
-    const minutes = date.getMinutes() > 0? "30" : "00";
-    const hours = currentHours < 10? `0${currentHours}` : currentHours;
+    const minutes = date.getMinutes() > 0 ? "30" : "00";
+    const hours = currentHours < 10 ? `0${currentHours}` : currentHours;
     const time = `${hours}:${minutes}`;
     return time;
   }
 
-  function createClickedHourDateEnd(date){
+  function createClickedHourDateEnd(date) {
     const newHours = date.getHours() + 1;
     date.setHours(newHours);
     return parsedClickedHourDate(date)
   }
 
   const handleSubmit = (event) => {
-    // Send the event data to your backend API or logic here
-    console.log({
-      eventName,
-      startHour,
-      endHour,
-      place,
-      isWeeklyRepeating,
-    });
-
-    // Reset the form after submission (optional)
     setEventName("");
     setStartHour("");
     setEndHour("");
@@ -74,52 +55,61 @@ function EventForm({clickedHourDate}) {
       <h2>Create Event</h2>
       <div className="input-group">
         <label htmlFor="eventName">Event Name:</label>
-        <input
-          type="text"
-          id="eventName"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-          required
-        />
+        <div className="input-group__right">
+          <input
+            type="text"
+            id="eventName"
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+            required
+          />
+        </div>
       </div>
       <div className="input-group">
         <label>Time (HH:MM):</label>
-        <CustomTimePicker
-          selectedTime={startHour}
-          setSelectedTime={setStartHour}
-          formValidations={formValidations}
-          inputName={START_INPUT_NAME}
-        />
+        <div className="input-group__right">
+          <CustomTimePicker
+            selectedTime={startHour}
+            setSelectedTime={setStartHour}
+            parentFormValidation={formValidationObject}
+            inputName={START_INPUT_NAME}
+          />
+        </div>
+
       </div>
       <div className="input-group">
         <label>End Hour (HH:MM):</label>
-        <CustomTimePicker
-          selectedTime={endHour}
-          setSelectedTime={setEndHour}
-          formValidations={formValidations}
-          inputName={END_INPUT_NAME}
-        />
+        <div className="input-group__right">
+          <CustomTimePicker
+            selectedTime={endHour}
+            setSelectedTime={setEndHour}
+            parentFormValidation={formValidationObject}
+            inputName={END_INPUT_NAME}
+          />
+        </div>
       </div>
-      .
+
       <div className="input-group">
         <label htmlFor="place">Place:</label>
-        <input
-          type="text"
-          id="place"
-          value={place}
-          onChange={(e) => setPlace(e.target.value)}
-        />
+        <div className="input-group__right">
+          <input
+            type="text"
+            id="place"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+          />
+        </div>
       </div>
       <div className="input-group">
         <label>
-          <input
+          Evento Semanal
+        </label>
+        <input
             type="checkbox"
             id="isWeeklyRepeating"
             checked={isWeeklyRepeating}
             onChange={(e) => setIsWeeklyRepeating(e.target.checked)}
           />
-          Evento Semanal
-        </label>
       </div>
       <button type="button" onClick={() => handleSubmit()}>
         Crear Evento

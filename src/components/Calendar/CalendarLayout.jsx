@@ -110,7 +110,7 @@ const CalendarLayout = () => {
       currentDate.getDay() === index &&
       targetDay.toDateString() === new Date().toDateString();
     return (
-      <div className={`day-header ${isToday ? "day-header__highlighted" : ""}`}>
+      <div className={`day-header ${isToday ? "day-header__highlighted" : ""}`} key={`${day}-${index}`}>
         {day} {targetDay.getDate()}
       </div>
     );

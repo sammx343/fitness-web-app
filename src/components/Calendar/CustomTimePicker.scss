@@ -1,7 +1,12 @@
-.time-inputs {
+.custom-time-picker {
   position: relative;
 
-  .secondary-input {
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .time-dropdown {
     display: none;
     width: 100%;
     position: absolute;
