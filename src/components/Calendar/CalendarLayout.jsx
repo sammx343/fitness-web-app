@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import CalendarEventModal from "./CalendarEventModal";
+import { daysOfTheWeek } from "../../utils/dateUtils";
 import "./CalendarLayout.scss";
 
 const hours = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 );
-const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const CalendarLayout = () => {
   const currentDate = new Date();
@@ -22,7 +22,7 @@ const CalendarLayout = () => {
   useEffect(() => { addRedIndicatorToCurrentDay() }, []);
 
   function addRedIndicatorToCurrentDay() {
-    const currentWeekDay = days[currentDate.getDay()];
+    const currentWeekDay = daysOfTheWeek[currentDate.getDay()];
     const hour = currentDate.getHours().toString().padStart(2, "0");
     const minutes = currentDate.getMinutes();
 
@@ -111,7 +111,7 @@ const CalendarLayout = () => {
       targetDay.toDateString() === new Date().toDateString();
     return (
       <div className={`day-header ${isToday ? "day-header__highlighted" : ""}`} key={`${day}-${index}`}>
-        {day} {targetDay.getDate()}
+        {day.substring(0,3)} {targetDay.getDate()}
       </div>
     );
   };
@@ -135,7 +135,7 @@ const CalendarLayout = () => {
       </div>
       <div className="week-days week-days-header">
         <div className="day-header"></div>
-        {days.map((day, index) => {
+        {daysOfTheWeek.map((day, index) => {
           return renderDayHeader(day, index)
         })}
       </div>
@@ -147,9 +147,8 @@ const CalendarLayout = () => {
             </div>
           ))}
         </div>
-        {days.map((day, index) => (
+        {daysOfTheWeek.map((day, index) => (
           <div key={day} className="week-day">
-
             {hours.map((hour) => (
               <div
                 onClick={(event) => hourClick(event, index, hour)}
