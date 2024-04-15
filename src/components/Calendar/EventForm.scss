@@ -1,9 +1,10 @@
 .input-group {
   display: flex;
   justify-content: space-between;
-  &__right{
-    margin-left: 50px;
-    width: 200px;
+
+  &__right {
+    width: 215px;
+    margin-left: 20px;
   }
 
   input[type=text] {
@@ -13,5 +14,18 @@
 
   p {
     margin: 0;
+  }
+
+  .time-picker-group {
+    display: flex;
+
+    .custom-time-picker {
+      max-width: 45px;
+    }
+
+    &__next-day-date {
+      position: relative;
+      left: 10px;
+    }
   }
 }
