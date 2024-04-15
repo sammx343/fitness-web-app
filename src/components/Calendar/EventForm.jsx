@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import CustomTimePicker from "./CustomTimePicker";
 import { daysOfTheWeek } from "../../utils/dateUtils";
+import { createEvent } from "../../services/events";
 import "./EventForm.scss";
 
 const hours = [];
@@ -21,25 +22,25 @@ function getMonthName(date) {
 }
 
 // Parses date to match format: Day of week, month day, Ex: Jueves, Abril 14
-function parseDate(date){
+function parseDate(date) {
   return `${daysOfTheWeek[date.getDay()]}, ${getMonthName(date)}`;
 }
 
 const START_INPUT_NAME = "start";
 const END_INPUT_NAME = "end";
 
-function EventForm({ clickedHourDate }) {
+function EventForm({ clickedHourDate, postSubmitCallback }) {
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
   const [startHour, setStartHour] = useState(parsedClickedHourDate(clickedHourDate));
   const [endHour, setEndHour] = useState(createClickedHourDateEnd(clickedHourDate));
   const [place, setPlace] = useState("");
-  const [isWeeklyRepeating, setIsWeeklyRepeating] = useState(false);
+  const [isWeekly, setIsWeekly] = useState(false);
   const [errors, setErrors] = useState({});
 
   //Adds an extra day to the current date in the case the initial hour is bigger than the end date
   //indicating that the event will take place in both days
-  const parseNextDay = useMemo(()=>{
+  const parseNextDay = useMemo(() => {
     let newDate = new Date(clickedHourDate);
     newDate.setDate(newDate.getDate() + 1);
     return endHour > startHour ? "" : parseDate(newDate)
@@ -87,7 +88,7 @@ function EventForm({ clickedHourDate }) {
     if (!endHour) {
       hasErrors = true;
       newErrors.endHour = "Selecciona una hora de finalización";
-    } 
+    }
 
     if (!place) {
       hasErrors = true;
@@ -101,17 +102,28 @@ function EventForm({ clickedHourDate }) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    const newEvent = {
+      name: eventName,
+      description,
+      startHour,
+      endHour,
+      place,
+      isWeekly
+    };
+
     if (!validateForm()) return;
 
-    // Submit form data (code would likely go here)
-    console.log("Submitting form...");
+    createEvent(newEvent).then(res => {
+      console.log(res);
+      setEventName("");
+      setDescription("");
+      setPlace("");
+      setIsWeekly(false);
+      setErrors({});
+    }).catch(error => {
+      console.log(error);
+    })
 
-    setEventName("");
-    setStartHour("");
-    setEndHour("");
-    setPlace("");
-    setIsWeeklyRepeating(false);
-    setErrors({}); // Clear errors after successful submission
   };
 
   return (
@@ -130,7 +142,7 @@ function EventForm({ clickedHourDate }) {
           {errors.eventName && <span className="error">{errors.eventName}</span>}
         </div>
       </div>
-      
+
       <div className="input-group">
         <label htmlFor="eventName">Descripción:</label>
         <div className="input-group__right">
@@ -180,9 +192,9 @@ function EventForm({ clickedHourDate }) {
         </label>
         <input
           type="checkbox"
-          id="isWeeklyRepeating"
-          checked={isWeeklyRepeating}
-          onChange={(e) => setIsWeeklyRepeating(e.target.checked)}
+          id="isWeekly"
+          checked={isWeekly}
+          onChange={(e) => setIsWeekly(e.target.checked)}
         />
       </div>
       <button type="button" onClick={(event) => handleSubmit(event)}>
