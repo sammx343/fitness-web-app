@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CalendarEventModal from "./CalendarEventModal";
 import { daysOfTheWeek } from "../../utils/dateUtils";
 import "./CalendarLayout.scss";
@@ -7,8 +7,9 @@ const hours = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 );
 
+const currentDate = new Date();
+
 const CalendarLayout = () => {
-  const currentDate = new Date();
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
@@ -20,6 +21,32 @@ const CalendarLayout = () => {
   useEffect(() => { getCurrentMonthsAndYears() }, [currentWeek]);
   useEffect(() => { parseCurrentMonth() }, [currentMonths, currentYears]);
   useEffect(() => { addRedIndicatorToCurrentDay() }, []);
+
+  const createWeekLayout = useMemo(() => {
+    return (
+      <div className="week-days" ref={calendarWeekDaysRef} >
+        <div className="week-day">
+          {hours.map((hour) => (
+            <div key={`${hour}`} className="day-hour">
+              {hour}
+            </div>
+          ))}
+        </div>
+        {daysOfTheWeek.map((day, index) => (
+          <div key={day} className="week-day">
+            {hours.map((hour) => (
+              <div
+                onClick={(event) => hourClick(event, index, hour)}
+                key={`${day}-${hour}`}
+                className="day-hour"
+                id={`${day}-${hour}`}
+              ></div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  }, []);
 
   function addRedIndicatorToCurrentDay() {
     const currentWeekDay = daysOfTheWeek[currentDate.getDay()];
@@ -61,13 +88,13 @@ const CalendarLayout = () => {
 
   //Parses the month(s) of the current week to show in the calendar layout header
   function parseCurrentMonth() {
-    if (currentMonths.length === 1){
+    if (currentMonths.length === 1) {
       setMonthsYearsHeader(`${currentMonths[0]} ${currentYears[0]}`);
     }
-    else if (currentMonths.length > 1 && currentYears.length === 1){
+    else if (currentMonths.length > 1 && currentYears.length === 1) {
       setMonthsYearsHeader(`${currentMonths[0]} - ${currentMonths[1]} ${currentYears[0]}`);
     }
-    else{
+    else {
       setMonthsYearsHeader(`${currentMonths[0]} ${currentYears[0]} - ${currentMonths[1]} ${currentYears[1]}`);
     }
   }
@@ -91,11 +118,10 @@ const CalendarLayout = () => {
   // today: 01/03/2024
   // output: 25/02/2024
   function getDateOfWeekDay(dayNumber) {
-    const today = new Date(); // Create a new Date object here
-    const todayDayOfWeek = today.getDay();
+    const todayDayOfWeek = currentDate.getDay();
 
     const dayOffset = dayNumber - todayDayOfWeek + 7 * currentWeek;
-    const targetDate = new Date(today.getTime()); // Create a copy of today
+    const targetDate = new Date(currentDate.getTime()); // Create a copy of today
     targetDate.setDate(targetDate.getDate() + dayOffset);
     return targetDate;
   }
@@ -111,7 +137,7 @@ const CalendarLayout = () => {
       targetDay.toDateString() === new Date().toDateString();
     return (
       <div className={`day-header ${isToday ? "day-header__highlighted" : ""}`} key={`${day}-${index}`}>
-        {day.substring(0,3)} {targetDay.getDate()}
+        {day.substring(0, 3)} {targetDay.getDate()}
       </div>
     );
   };
@@ -139,27 +165,7 @@ const CalendarLayout = () => {
           return renderDayHeader(day, index)
         })}
       </div>
-      <div className="week-days" ref={calendarWeekDaysRef} >
-        <div className="week-day">
-          {hours.map((hour) => (
-            <div key={`${hour}`} className="day-hour">
-              {hour}
-            </div>
-          ))}
-        </div>
-        {daysOfTheWeek.map((day, index) => (
-          <div key={day} className="week-day">
-            {hours.map((hour) => (
-              <div
-                onClick={(event) => hourClick(event, index, hour)}
-                key={`${day}-${hour}`}
-                className="day-hour"
-                id={`${day}-${hour}`}
-              ></div>
-            ))}
-          </div>
-        ))}
-      </div>
+      {createWeekLayout}
       {shouldOpenModal && (
         <CalendarEventModal setShouldOpenModal={setShouldOpenModal} clickedHourDate={clickedHourDate} />
       )}

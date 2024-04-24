@@ -9,7 +9,7 @@ import UserProfile from "./pages/UserProfile";
 import PrivateRoute from "./auth/PrivateRoute";
 import TeachersRoute from "./auth/TeachersRoute";
 import NotFound from "./pages/NotFound";
-import BusinessProfile from "./pages/BusinessProfile";
+import {BusinessProfile} from "./pages/BusinessProfile";
 import CreateBusiness from "./pages/CreateBusiness";
 import routes from "./AppRoutes.json";
 
