@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import CustomTimePicker from "./CustomTimePicker";
-import { daysOfTheWeek } from "../../utils/dateUtils";
+import { daysOfTheWeek, parseTimeString } from "../../utils/dateUtils";
 import { createEvent } from "../../services/events";
+import { BusinessContext } from "../../pages/BusinessProfile";
 import "./EventForm.scss";
 
 const hours = [];
@@ -30,10 +31,11 @@ const START_INPUT_NAME = "start";
 const END_INPUT_NAME = "end";
 
 function EventForm({ clickedHourDate, postSubmitCallback }) {
+  const {business, user} = useContext(BusinessContext);
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
-  const [startHour, setStartHour] = useState(parsedClickedHourDate(clickedHourDate));
-  const [endHour, setEndHour] = useState(createClickedHourDateEnd(clickedHourDate));
+  const [startHour, setStartHour] = useState(() => parsedClickedHourDate(clickedHourDate));
+  const [endHour, setEndHour] = useState(() => createClickedHourDateEnd(clickedHourDate));
   const [place, setPlace] = useState("");
   const [isWeekly, setIsWeekly] = useState(false);
   const [errors, setErrors] = useState({});
@@ -57,18 +59,20 @@ function EventForm({ clickedHourDate, postSubmitCallback }) {
     return {};
   };
 
+  //Returns hours string in format "hh:mm". Minutes are always '00' or '30'
   function parsedClickedHourDate(date) {
     const currentHours = date.getHours();
-    const minutes = date.getMinutes() > 0 ? "30" : "00";
+    const minutes = date.getMinutes() >= 30 ? "30" : "00";
     const hours = currentHours < 10 ? `0${currentHours}` : currentHours;
     const time = `${hours}:${minutes}`;
     return time;
   }
 
   function createClickedHourDateEnd(date) {
-    const newHours = date.getHours() + 1;
-    date.setHours(newHours);
-    return parsedClickedHourDate(date)
+    const newHours = new Date(date)
+    newHours.setHours(date.getHours() + 1);
+
+    return parsedClickedHourDate(newHours)
   }
 
   const validateForm = () => {
@@ -101,25 +105,26 @@ function EventForm({ clickedHourDate, postSubmitCallback }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     const newEvent = {
       name: eventName,
       description,
-      startHour,
-      endHour,
+      startHour: parseTimeString(startHour),
+      endHour: endHour > startHour? parseTimeString(endHour) : parseTimeString(endHour, 1),
       place,
-      isWeekly
+      isWeekly,
+      userId: user._id,
+      businessId: business._id
     };
 
     if (!validateForm()) return;
 
     createEvent(newEvent).then(res => {
-      console.log(res);
       setEventName("");
       setDescription("");
       setPlace("");
       setIsWeekly(false);
       setErrors({});
+      postSubmitCallback();
     }).catch(error => {
       console.log(error);
     })

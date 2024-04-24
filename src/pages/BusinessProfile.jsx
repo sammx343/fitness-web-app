@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import { useParams } from "react-router-dom";
 import { getBusinessById } from "../services/businesses";
 import CalendarLayout from "../components/Calendar/CalendarLayout";
 import { useAuth } from "../auth/AuthContext";
 import "./BusinessProfile.scss";
+
+const BusinessContext = createContext('business');
 
 const BusinessProfile = () => {
   const { id } = useParams();
@@ -32,10 +34,12 @@ const BusinessProfile = () => {
         <p>Email: {business.email}</p>
       </div>
       <div className="business-profile__calendar">
-        <CalendarLayout/>
+        <BusinessContext.Provider value={{business, user}}>
+          <CalendarLayout />
+        </BusinessContext.Provider>
       </div>
     </main>
   );
 };
 
-export default BusinessProfile;
+export {BusinessProfile, BusinessContext};

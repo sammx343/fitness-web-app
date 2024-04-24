@@ -11,7 +11,7 @@ const CalendarEventModal = ({ setShouldOpenModal, clickedHourDate}) => {
       ></div>
       <div className="calendar-event-modal__content">
         <h1>Calendar Event Modal</h1>
-        <EventForm clickedHourDate={clickedHourDate}/>
+        <EventForm clickedHourDate={clickedHourDate} postSubmitCallback={() => setShouldOpenModal(false)}/>
       </div>
     </div>
   );
