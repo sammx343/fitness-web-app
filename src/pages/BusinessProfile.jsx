@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getBusinessById } from "../services/businesses";
 import CalendarLayout from "../components/Calendar/CalendarLayout";
 import { useAuth } from "../auth/AuthContext";
+import { getEventsByBusinessId } from "../services/events";
 import "./BusinessProfile.scss";
 
 const BusinessContext = createContext('business');
@@ -11,6 +12,15 @@ const BusinessProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const [business, setBusiness] = useState(null);
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    getEventsByBusinessId(id)
+      .then(res => {
+        setEvents(res.data.events);
+      })
+      .catch(e => console.log(e))
+  }, [id])
 
   useEffect(() => {
     getBusinessById(id)
@@ -34,12 +44,12 @@ const BusinessProfile = () => {
         <p>Email: {business.email}</p>
       </div>
       <div className="business-profile__calendar">
-        <BusinessContext.Provider value={{business, user}}>
-          <CalendarLayout />
+        <BusinessContext.Provider value={{ business, user }}>
+          <CalendarLayout events={events}/>
         </BusinessContext.Provider>
       </div>
     </main>
   );
 };
 
-export {BusinessProfile, BusinessContext};
+export { BusinessProfile, BusinessContext };

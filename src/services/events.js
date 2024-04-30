@@ -9,4 +9,12 @@ const createEvent = (params) => {
   }
 };
 
-export { createEvent };
+const getEventsByBusinessId = (id) => {
+  try {
+    return axios.get(`${config.apiUrl}/events/list?id=${id}`);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export { createEvent, getEventsByBusinessId };

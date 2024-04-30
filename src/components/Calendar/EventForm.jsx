@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useContext } from "react";
 import CustomTimePicker from "./CustomTimePicker";
-import { daysOfTheWeek, parseTimeString } from "../../utils/dateUtils";
+import { daysOfTheWeekSpanish, parseTimeString } from "../../utils/dateUtils";
 import { createEvent } from "../../services/events";
 import { BusinessContext } from "../../pages/BusinessProfile";
 import "./EventForm.scss";
@@ -24,7 +24,7 @@ function getMonthName(date) {
 
 // Parses date to match format: Day of week, month day, Ex: Jueves, Abril 14
 function parseDate(date) {
-  return `${daysOfTheWeek[date.getDay()]}, ${getMonthName(date)}`;
+  return `${daysOfTheWeekSpanish[date.getDay()]}, ${getMonthName(date)}`;
 }
 
 const START_INPUT_NAME = "start";
@@ -108,8 +108,8 @@ function EventForm({ clickedHourDate, postSubmitCallback }) {
     const newEvent = {
       name: eventName,
       description,
-      startHour: parseTimeString(startHour),
-      endHour: endHour > startHour? parseTimeString(endHour) : parseTimeString(endHour, 1),
+      startHour: parseTimeString(startHour, clickedHourDate),
+      endHour: endHour > startHour? parseTimeString(endHour, clickedHourDate) : parseTimeString(endHour, clickedHourDate, 1),
       place,
       isWeekly,
       userId: user._id,
