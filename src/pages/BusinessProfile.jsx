@@ -11,16 +11,23 @@ const BusinessContext = createContext('business');
 const BusinessProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const [searchDate, setSearchDate] = useState(null);
   const [business, setBusiness] = useState(null);
   const [events, setEvents] = useState([]);
 
+  useEffect(()=>{
+    console.log(searchDate);
+  }, [searchDate]);
+  
   useEffect(() => {
-    getEventsByBusinessId(id)
+    if(searchDate === null) return; 
+    
+    getEventsByBusinessId(id, searchDate.startDate, searchDate.endDate)
       .then(res => {
         setEvents(res.data.events);
       })
       .catch(e => console.log(e))
-  }, [id])
+  }, [id, searchDate])
 
   useEffect(() => {
     getBusinessById(id)
@@ -45,7 +52,7 @@ const BusinessProfile = () => {
       </div>
       <div className="business-profile__calendar">
         <BusinessContext.Provider value={{ business, user }}>
-          <CalendarLayout events={events}/>
+          <CalendarLayout events={events} setSearchDate={setSearchDate}/>
         </BusinessContext.Provider>
       </div>
     </main>

@@ -12,7 +12,7 @@ const EVENT_MINUTES_SIZE_SMALL = 20;
 const EVENT_MINUTES_SIZE_MEDIUM = 30;
 const currentDate = new Date();
 
-const CalendarLayout = ({ events }) => {
+const CalendarLayout = ({ events, setSearchDate}) => {
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
@@ -32,6 +32,13 @@ const CalendarLayout = ({ events }) => {
     const eventsWidthPosition = addEventsWidthAndPosition(eventsWeekDaysObject);
     setDayOfWeekEvents(eventsWidthPosition)
   }, [events]);
+
+  useEffect(()=>{
+    setSearchDate({
+      startDate: getDateOfWeekDay(0),
+      endDate: getDateOfWeekDay(6)
+    });
+  }, [currentWeek])
 
   const createWeekLayout = useMemo(() => {
     return (
@@ -124,14 +131,18 @@ const CalendarLayout = ({ events }) => {
 
   function addEventsWidthAndPosition(weekDaysObject) {
     Object.values(weekDaysObject).forEach(weekDay => {
-      weekDay.forEach(currentEvent => {
-        weekDay.forEach((event) => {
+      weekDay.forEach((currentEvent, index1) => {
+        weekDay.forEach((event, index2) => {
           if (event._id === currentEvent._id) return;
           const eventsAreOverlaping = areEventsOverlaping(event, currentEvent);
           if (eventsAreOverlaping) {
+            //Overlapping count will determine the width
             currentEvent.overlapingCount = currentEvent.overlapingCount ? currentEvent.overlapingCount + 1 : 2;
-            if (event.startHour <= currentEvent.startHour) {
-              currentEvent.position = currentEvent.position ? currentEvent.position + + 1 : 2;
+            //Overlapping position will determine the left position
+            if (new Date(event.startHour) < new Date(currentEvent.startHour)) {
+              currentEvent.position = currentEvent.position ? currentEvent.position + 1 : 2;
+            } else if(new Date(event.startHour).getTime() == new Date(currentEvent.startHour).getTime() && index1 > index2){
+              currentEvent.position = currentEvent.position ? currentEvent.position + 1 : 2;
             }
           };
         });
@@ -148,9 +159,9 @@ const CalendarLayout = ({ events }) => {
     const event1Duration = returnMinutesAccordingToDuration(parsedEvent1.endMinutes - parsedEvent1.startMinutes);
     const event2Duration = returnMinutesAccordingToDuration(parsedEvent2.endMinutes - parsedEvent2.startMinutes);
 
-    if (parsedEvent2.startMinutes >= parsedEvent1.startMinutes && parsedEvent2.startMinutes < parsedEvent1.startMinutes + event1Duration) {
+    if (parsedEvent2.startMinutes >= parsedEvent1.startMinutes && parsedEvent2.startMinutes <= parsedEvent1.startMinutes + event1Duration) {
       return true
-    } else if (parsedEvent1.startMinutes >= parsedEvent2.startMinutes && parsedEvent1.startMinutes < parsedEvent2.startMinutes + event2Duration) {
+    } else if (parsedEvent1.startMinutes >= parsedEvent2.startMinutes && parsedEvent1.startMinutes <= parsedEvent2.startMinutes + event2Duration) {
       return true
     }
     return false;
@@ -169,6 +180,7 @@ const CalendarLayout = ({ events }) => {
 
   function createEventsInLayout(events, id) {
     if (!events || Object.keys(events).length === 0) return '';
+    console.log(events)
     return (
       <Fragment>
         {Object.values(events).map((event, index) => {
@@ -178,7 +190,7 @@ const CalendarLayout = ({ events }) => {
           const eventMinutesDuration = eventParsedInfo.endMinutes - eventParsedInfo.startMinutes;
           const height = returnMinutesAccordingToDuration(eventMinutesDuration) * weekDayColumn?.offsetHeight / MINUTES_A_DAY;
           return (<div className={`event ${height < EVENT_MINUTES_SIZE_SMALL ? 'event--small' : ''} ${height > EVENT_MINUTES_SIZE_SMALL && height < EVENT_MINUTES_SIZE_MEDIUM ? 'event--medium' : ''}`}
-            style={{ top: offsetTop, height, width: `${(100 / event.overlapingCount)}%`, left: `${calculateEventLeftPosition(event)}%` }} key={`${id}-${index}`}>
+            style={{ top: offsetTop, height, width: `${(100 / event.overlapingCount)}%`, left: `${calculateEventLeftPosition(event)}%` }} key={`${id}-${index}-${currentWeek}`}>
             <h3>{event.name}</h3>
             <div className="event__hours">
               <p>{`${padTime(eventParsedInfo.startDate.getHours())}:${padTime(eventParsedInfo.startDate.getMinutes())}`}</p>

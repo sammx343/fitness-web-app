@@ -9,9 +9,9 @@ const createEvent = (params) => {
   }
 };
 
-const getEventsByBusinessId = (id) => {
+const getEventsByBusinessId = (id, startDate, endDate) => {
   try {
-    return axios.get(`${config.apiUrl}/events/list?id=${id}`);
+    return axios.get(`${config.apiUrl}/events/list?id=${id}&startDate=${startDate}&endDate=${endDate}`);
   } catch (e) {
     console.log(e);
   }
