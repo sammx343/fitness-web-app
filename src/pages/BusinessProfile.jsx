@@ -20,24 +20,28 @@ const BusinessProfile = () => {
   }, [searchDate]);
   
   useEffect(() => {
-    if(searchDate === null) return; 
-    
-    getEventsByBusinessId(id, searchDate.startDate, searchDate.endDate)
-      .then(res => {
-        setEvents(res.data.events);
-      })
-      .catch(e => console.log(e))
+    getEventList();
   }, [id, searchDate])
 
   useEffect(() => {
     getBusinessById(id)
-      .then((res) => {
+      ?.then((res) => {
         setBusiness(res.data.business);
       })
       .catch((e) => {
         console.error("Error fetching user data:", e);
       });
   }, [id]);
+
+  function getEventList(){
+    if(searchDate === null) return;
+    
+    getEventsByBusinessId(id, searchDate.startDate, searchDate.endDate)
+      ?.then(res => {
+        setEvents(res.data.events);
+      })
+      .catch(e => console.log(e))
+  }
 
   if (!business) {
     return <p>Loading...</p>;
@@ -52,7 +56,7 @@ const BusinessProfile = () => {
       </div>
       <div className="business-profile__calendar">
         <BusinessContext.Provider value={{ business, user }}>
-          <CalendarLayout events={events} setSearchDate={setSearchDate}/>
+          <CalendarLayout events={events} setSearchDate={setSearchDate} submitEventCallback={getEventList}/>
         </BusinessContext.Provider>
       </div>
     </main>

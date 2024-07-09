@@ -30,7 +30,7 @@ function parseDate(date) {
 const START_INPUT_NAME = "start";
 const END_INPUT_NAME = "end";
 
-function EventForm({ clickedHourDate, postSubmitCallback }) {
+function EventForm({ clickedHourDate, submitEventCallback }) {
   const {business, user} = useContext(BusinessContext);
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
@@ -124,7 +124,7 @@ function EventForm({ clickedHourDate, postSubmitCallback }) {
       setPlace("");
       setIsWeekly(false);
       setErrors({});
-      postSubmitCallback();
+      submitEventCallback();
     }).catch(error => {
       console.log(error);
     })

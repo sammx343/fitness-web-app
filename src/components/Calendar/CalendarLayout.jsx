@@ -12,7 +12,7 @@ const EVENT_MINUTES_SIZE_SMALL = 20;
 const EVENT_MINUTES_SIZE_MEDIUM = 30;
 const currentDate = new Date();
 
-const CalendarLayout = ({ events, setSearchDate}) => {
+const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
@@ -72,7 +72,7 @@ const CalendarLayout = ({ events, setSearchDate}) => {
 
 
   //Given an array of events, each containing a date, creates an object in which
-  //each key wil be a day of the week containing an array which is event corresponding
+  //each key will be a day of the week containing an array which its corresponding event 
   //to that date: Ex: 
   // Input: 
   // [ {startHour: "2024-04-23T17:30:00.000Z", eventName: 'Karate'},  {startHour: "2024-04-24T18:30:00.000Z", eventName: 'Abs'}]
@@ -122,7 +122,7 @@ const CalendarLayout = ({ events, setSearchDate}) => {
   
     // Normalize endHour object
     const normalizedEndObject = {
-      ...originalObject, // Copy all properties from original object
+      ...originalObject,
       startHour: new Date(endDate.setHours(0, 0, 0, 0)).toString(),
     };
   
@@ -234,7 +234,7 @@ const CalendarLayout = ({ events, setSearchDate}) => {
     const id = `${currentWeekDay}-${hour}`
 
     if (calendarWeekDaysRef.current) {
-      const targetElement = calendarWeekDaysRef.current.querySelector(`[id*="${id}"]`); // Adjust selector based on your ID scheme
+      const targetElement = calendarWeekDaysRef.current.querySelector(`[id*="${id}"]`);
       if (targetElement) {
         targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
         targetElement.classList.add("current-hour");
@@ -345,7 +345,7 @@ const CalendarLayout = ({ events, setSearchDate}) => {
       </div>
       {createWeekLayout}
       {shouldOpenModal && (
-        <CalendarEventModal setShouldOpenModal={setShouldOpenModal} clickedHourDate={clickedHourDate} />
+        <CalendarEventModal setShouldOpenModal={setShouldOpenModal} submitEventCallback={submitEventCallback} clickedHourDate={clickedHourDate} />
       )}
     </div>
   );
