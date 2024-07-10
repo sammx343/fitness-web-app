@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useContext } from "react";
 import CustomTimePicker from "./CustomTimePicker";
 import { daysOfTheWeekSpanish, parseTimeString } from "../../utils/dateUtils";
-import { createEvent } from "../../services/events";
+import { createEvent, editEvent} from "../../services/events";
 import { BusinessContext } from "../../pages/BusinessProfile";
 import "./EventForm.scss";
 
@@ -30,14 +30,14 @@ function parseDate(date) {
 const START_INPUT_NAME = "start";
 const END_INPUT_NAME = "end";
 
-function EventForm({ clickedHourDate, submitEventCallback }) {
+function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) {
   const {business, user} = useContext(BusinessContext);
-  const [eventName, setEventName] = useState("");
-  const [description, setDescription] = useState("");
-  const [startHour, setStartHour] = useState(() => parsedClickedHourDate(clickedHourDate));
-  const [endHour, setEndHour] = useState(() => createClickedHourDateEnd(clickedHourDate));
-  const [place, setPlace] = useState("");
-  const [isWeekly, setIsWeekly] = useState(false);
+  const [eventName, setEventName] = useState(event?.name || "");
+  const [description, setDescription] = useState(event?.description || "");
+  const [startHour, setStartHour] = useState(parsedClickedHourDate(clickedHourDate));
+  const [endHour, setEndHour] = useState(parsedClickedHourDate(endHourDate));
+  const [place, setPlace] = useState(event?.place || "");
+  const [isWeekly, setIsWeekly] = useState(event?.isWeekly);
   const [errors, setErrors] = useState({});
 
   //Adds an extra day to the current date in the case the initial hour is bigger than the end date
@@ -103,8 +103,8 @@ function EventForm({ clickedHourDate, submitEventCallback }) {
     return !hasErrors;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (submitEvent) => {
+    submitEvent.preventDefault();
     const newEvent = {
       name: eventName,
       description,
@@ -118,7 +118,9 @@ function EventForm({ clickedHourDate, submitEventCallback }) {
 
     if (!validateForm()) return;
 
-    createEvent(newEvent).then(res => {
+    const submitEndpointMethod = event? editEvent : createEvent;
+
+    submitEndpointMethod(newEvent, event._id)?.then(res => {
       setEventName("");
       setDescription("");
       setPlace("");
@@ -127,8 +129,7 @@ function EventForm({ clickedHourDate, submitEventCallback }) {
       submitEventCallback();
     }).catch(error => {
       console.log(error);
-    })
-
+    });
   };
 
   return (
@@ -203,7 +204,8 @@ function EventForm({ clickedHourDate, submitEventCallback }) {
         />
       </div>
       <button type="button" onClick={(event) => handleSubmit(event)}>
-        Crear Evento
+        { event && 'Editar Evento'} 
+        { !event && 'Crear Evento'} 
       </button>
     </form>
   );

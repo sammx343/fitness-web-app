@@ -9,6 +9,14 @@ const createEvent = (params) => {
   }
 };
 
+const editEvent = (params, id) => {
+  try {
+    return axios.put(`${config.apiUrl}/events/${id}`, params);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 const getEventsByBusinessId = (id, startDate, endDate) => {
   try {
     return axios.get(`${config.apiUrl}/events/list?id=${id}&startDate=${startDate}&endDate=${endDate}`);
@@ -17,4 +25,4 @@ const getEventsByBusinessId = (id, startDate, endDate) => {
   }
 };
 
-export { createEvent, getEventsByBusinessId };
+export { createEvent, editEvent, getEventsByBusinessId };

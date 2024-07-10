@@ -12,14 +12,16 @@ const EVENT_MINUTES_SIZE_SMALL = 20;
 const EVENT_MINUTES_SIZE_MEDIUM = 30;
 const currentDate = new Date();
 
-const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
+const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
   const [currentWeek, setCurrentWeek] = useState(0);
   const [shouldOpenModal, setShouldOpenModal] = useState(false);
   const [clickedHourDate, setClickedHourDate] = useState(null);
+  const [endHourDate, setEndHourDate] = useState(null);
   const [dayOfWeekEvents, setDayOfWeekEvents] = useState(null);
+  const [clickedEvent, setClickedEvent] = useState(null);
 
   const calendarWeekDaysRef = useRef(null);
 
@@ -33,7 +35,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
     setDayOfWeekEvents(eventsWidthPosition)
   }, [events]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setSearchDate({
       startDate: getDateOfWeekDay(0),
       endDate: getDateOfWeekDay(6)
@@ -86,9 +88,9 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
 
   //Some events can be create in two dates, for example, start at Wednesday 9pm and end at Thursday 9am
   //So we separate those events visually into two
-  function partitionEvents(events){
-    return events.reduce((accum, event)=>{
-      if(eventHappensInTwoDays(event)){
+  function partitionEvents(events) {
+    return events.reduce((accum, event) => {
+      if (eventHappensInTwoDays(event)) {
         const [firstEvent, secondEvent] = normalizeDateHours(event);
         return [...accum, firstEvent, secondEvent];
       } else {
@@ -97,7 +99,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
     }, []);
   }
 
-  function addEventToDayOfWeek(accum, currentEvent){
+  function addEventToDayOfWeek(accum, currentEvent) {
     const eventStartHourDate = new Date(currentEvent.startHour);
     const dayOfWeek = daysOfWeek[eventStartHourDate.getDay()];
     let dayWeekArrayEvents = [currentEvent];
@@ -107,26 +109,26 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
     return { ...accum, [dayOfWeek]: dayWeekArrayEvents }
   }
 
-  function eventHappensInTwoDays(event){
+  function eventHappensInTwoDays(event) {
     return (new Date(event.startHour)).getDay() != (new Date(event.endHour).getDay());
   }
 
   function normalizeDateHours(originalObject) {
     const startDate = new Date(originalObject.startHour);
     const endDate = new Date(originalObject.endHour);
-  
+
     const normalizedStartObject = {
       ...originalObject,
       endHour: (new Date(startDate.setHours(23, 59, 59, 999))).toString(),
     };
-  
+
     // Normalize endHour object
     const normalizedEndObject = {
       ...originalObject,
       startHour: new Date(endDate.setHours(0, 0, 0, 0)).toString(),
     };
-  
-    return [ normalizedStartObject, normalizedEndObject ];
+
+    return [normalizedStartObject, normalizedEndObject];
   }
 
   function addEventsWidthAndPosition(weekDaysObject) {
@@ -141,7 +143,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
             //Overlapping position will determine the left position
             if (new Date(event.startHour) < new Date(currentEvent.startHour)) {
               currentEvent.position = currentEvent.position ? currentEvent.position + 1 : 2;
-            } else if(new Date(event.startHour).getTime() == new Date(currentEvent.startHour).getTime() && index1 > index2){
+            } else if (new Date(event.startHour).getTime() == new Date(currentEvent.startHour).getTime() && index1 > index2) {
               currentEvent.position = currentEvent.position ? currentEvent.position + 1 : 2;
             }
           };
@@ -180,7 +182,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
 
   function createEventsInLayout(events, id) {
     if (!events || Object.keys(events).length === 0) return '';
-    console.log(events)
+
     return (
       <Fragment>
         {Object.values(events).map((event, index) => {
@@ -189,7 +191,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
           const offsetTop = (eventParsedInfo.startMinutes / MINUTES_A_DAY) * weekDayColumn?.offsetHeight;
           const eventMinutesDuration = eventParsedInfo.endMinutes - eventParsedInfo.startMinutes;
           const height = returnMinutesAccordingToDuration(eventMinutesDuration) * weekDayColumn?.offsetHeight / MINUTES_A_DAY;
-          return (<div className={`event ${height < EVENT_MINUTES_SIZE_SMALL ? 'event--small' : ''} ${height > EVENT_MINUTES_SIZE_SMALL && height < EVENT_MINUTES_SIZE_MEDIUM ? 'event--medium' : ''}`}
+          return (<div onClick={() => OnEventClick(event)} className={`event ${height < EVENT_MINUTES_SIZE_SMALL ? 'event--small' : ''} ${height > EVENT_MINUTES_SIZE_SMALL && height < EVENT_MINUTES_SIZE_MEDIUM ? 'event--medium' : ''}`}
             style={{ top: offsetTop, height, width: `${(100 / event.overlapingCount)}%`, left: `${calculateEventLeftPosition(event)}%` }} key={`${id}-${index}-${currentWeek}`}>
             <h3>{event.name}</h3>
             <div className="event__hours">
@@ -201,6 +203,13 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
         })}
       </Fragment>
     )
+  }
+
+  function OnEventClick(event) {
+    setShouldOpenModal(true);
+    setClickedEvent(event);
+    setClickedHourDate(new Date(event?.startHour));
+    setEndHourDate(new Date(event?.endHour));
   }
 
   function calculateEventLeftPosition(event) {
@@ -279,14 +288,21 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
 
   function hourClick(event, dayIndex, hour) {
     // event.target.style.backgroundColor = "red";
-
+    
+    setClickedEvent(null);
+    
     const offsetY = event.nativeEvent.offsetY;
     const divHeight = event.target.offsetHeight;
     const distanceToTopPercentage = offsetY / divHeight;
     const half = distanceToTopPercentage < 0.5 ? "00" : "30";
     const date = getDateOfWeekDay(dayIndex);
     date.setHours(hour, half, 0);
-    setClickedHourDate(date)
+    setClickedHourDate(date);
+    
+    const newHours = new Date(date)
+    newHours.setHours(date.getHours() + 1);
+    setEndHourDate(newHours);
+
     setShouldOpenModal(true);
   }
 
@@ -345,7 +361,13 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback}) => {
       </div>
       {createWeekLayout}
       {shouldOpenModal && (
-        <CalendarEventModal setShouldOpenModal={setShouldOpenModal} submitEventCallback={submitEventCallback} clickedHourDate={clickedHourDate} />
+        <CalendarEventModal
+          setShouldOpenModal={setShouldOpenModal}
+          submitEventCallback={submitEventCallback}
+          clickedHourDate={clickedHourDate}
+          endHourDate={endHourDate} 
+          event={clickedEvent}
+          />
       )}
     </div>
   );
