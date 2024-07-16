@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useContext } from "react";
 import CustomTimePicker from "./CustomTimePicker";
 import { daysOfTheWeekSpanish, parseTimeString } from "../../utils/dateUtils";
-import { createEvent, editEvent} from "../../services/events";
+import { createEvent, editEvent, deleteEvent} from "../../services/events";
 import { BusinessContext } from "../../pages/BusinessProfile";
 import "./EventForm.scss";
 
@@ -37,7 +37,7 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
   const [startHour, setStartHour] = useState(parsedClickedHourDate(clickedHourDate));
   const [endHour, setEndHour] = useState(parsedClickedHourDate(endHourDate));
   const [place, setPlace] = useState(event?.place || "");
-  const [isWeekly, setIsWeekly] = useState(event?.isWeekly);
+  const [isWeekly, setIsWeekly] = useState(event?.isWeekly || false);
   const [errors, setErrors] = useState({});
 
   //Adds an extra day to the current date in the case the initial hour is bigger than the end date
@@ -120,12 +120,20 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
 
     const submitEndpointMethod = event? editEvent : createEvent;
 
-    submitEndpointMethod(newEvent, event._id)?.then(res => {
+    submitEndpointMethod(newEvent, event?._id)?.then(res => {
       setEventName("");
       setDescription("");
       setPlace("");
       setIsWeekly(false);
       setErrors({});
+      submitEventCallback();
+    }).catch(error => {
+      console.log(error);
+    });
+  };
+
+  const deleteCurrentEvent = () => {
+    deleteEvent(event?._id)?.then( res => {
       submitEventCallback();
     }).catch(error => {
       console.log(error);
@@ -207,6 +215,7 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
         { event && 'Editar Evento'} 
         { !event && 'Crear Evento'} 
       </button>
+      { event && (<a href="#" onClick={() => deleteCurrentEvent()}>Eliminar evento</a>)} 
     </form>
   );
 }
