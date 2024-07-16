@@ -17,6 +17,14 @@ const editEvent = (params, id) => {
   }
 }
 
+const deleteEvent = (id) => {
+  try{
+    return axios.delete(`${config.apiUrl}/events/${id}`);
+  }catch(e){
+    console.log(e);
+  }
+};
+
 const getEventsByBusinessId = (id, startDate, endDate) => {
   try {
     return axios.get(`${config.apiUrl}/events/list?id=${id}&startDate=${startDate}&endDate=${endDate}`);
@@ -25,4 +33,4 @@ const getEventsByBusinessId = (id, startDate, endDate) => {
   }
 };
 
-export { createEvent, editEvent, getEventsByBusinessId };
+export { createEvent, editEvent, deleteEvent, getEventsByBusinessId };

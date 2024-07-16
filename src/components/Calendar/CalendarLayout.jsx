@@ -150,6 +150,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
         });
       });
     });
+    console.log(weekDaysObject)
     return weekDaysObject;
   }
 
@@ -161,9 +162,9 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
     const event1Duration = returnMinutesAccordingToDuration(parsedEvent1.endMinutes - parsedEvent1.startMinutes);
     const event2Duration = returnMinutesAccordingToDuration(parsedEvent2.endMinutes - parsedEvent2.startMinutes);
 
-    if (parsedEvent2.startMinutes >= parsedEvent1.startMinutes && parsedEvent2.startMinutes <= parsedEvent1.startMinutes + event1Duration) {
+    if (parsedEvent2.startMinutes > parsedEvent1.startMinutes && parsedEvent2.startMinutes < parsedEvent1.startMinutes + event1Duration) {
       return true
-    } else if (parsedEvent1.startMinutes >= parsedEvent2.startMinutes && parsedEvent1.startMinutes <= parsedEvent2.startMinutes + event2Duration) {
+    } else if (parsedEvent1.startMinutes > parsedEvent2.startMinutes && parsedEvent1.startMinutes < parsedEvent2.startMinutes + event2Duration) {
       return true
     }
     return false;
