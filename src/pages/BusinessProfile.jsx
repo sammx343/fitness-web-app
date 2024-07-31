@@ -15,10 +15,6 @@ const BusinessProfile = () => {
   const [business, setBusiness] = useState(null);
   const [events, setEvents] = useState([]);
 
-  useEffect(()=>{
-    console.log(searchDate);
-  }, [searchDate]);
-  
   useEffect(() => {
     getEventList();
   }, [id, searchDate])
