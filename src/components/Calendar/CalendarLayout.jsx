@@ -31,7 +31,9 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
   useEffect(() => {
     const partitionedEventsIfTwoDays = partitionEvents(events);
     const eventsWeekDaysObject = reduceEventsToDaysOfTheWeekObject(partitionedEventsIfTwoDays);
-    const eventsWidthPosition = addEventsWidthAndPosition(eventsWeekDaysObject);
+    const sortedWeekDaysEvents = sortEventsByStartHour(eventsWeekDaysObject);
+    const eventsWidthPosition = addEventsWidthAndPosition(sortedWeekDaysEvents);
+    
     setDayOfWeekEvents(eventsWidthPosition)
   }, [events]);
 
@@ -84,6 +86,19 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
     return events.reduce((accum, currentEvent) => {
       return addEventToDayOfWeek(accum, currentEvent);
     }, {});
+  }
+
+  function sortEventsByStartHour(weekDays) {
+    const sortedSchedule = { ...weekDays };
+    for (const day in sortedSchedule) {
+      sortedSchedule[day].sort((a, b) => {
+        const startHourA = new Date(a.startHour);
+        const startHourB = new Date(b.startHour);
+        return startHourA.getHours()*60 + startHourA.getMinutes() - startHourB.getHours()*60 + startHourB.getMinutes();
+      });
+    }
+  
+    return sortedSchedule;
   }
 
   //Some events can be create in two dates, for example, start at Wednesday 9pm and end at Thursday 9am
@@ -150,7 +165,6 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
         });
       });
     });
-    console.log(weekDaysObject)
     return weekDaysObject;
   }
 
@@ -289,9 +303,9 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
 
   function hourClick(event, dayIndex, hour) {
     // event.target.style.backgroundColor = "red";
-    
+
     setClickedEvent(null);
-    
+
     const offsetY = event.nativeEvent.offsetY;
     const divHeight = event.target.offsetHeight;
     const distanceToTopPercentage = offsetY / divHeight;
@@ -299,7 +313,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
     const date = getDateOfWeekDay(dayIndex);
     date.setHours(hour, half, 0);
     setClickedHourDate(date);
-    
+
     const newHours = new Date(date)
     newHours.setHours(date.getHours() + 1);
     setEndHourDate(newHours);
@@ -366,9 +380,9 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
           setShouldOpenModal={setShouldOpenModal}
           submitEventCallback={submitEventCallback}
           clickedHourDate={clickedHourDate}
-          endHourDate={endHourDate} 
+          endHourDate={endHourDate}
           event={clickedEvent}
-          />
+        />
       )}
     </div>
   );
