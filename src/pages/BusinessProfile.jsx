@@ -4,6 +4,7 @@ import { getBusinessById } from "../services/businesses";
 import CalendarLayout from "../components/Calendar/CalendarLayout";
 import { useAuth } from "../auth/AuthContext";
 import { getEventsByBusinessId } from "../services/events";
+import { getUserRoleInBusiness } from "../services/users";
 import "./BusinessProfile.scss";
 
 const BusinessContext = createContext('business');
@@ -14,10 +15,18 @@ const BusinessProfile = () => {
   const [searchDate, setSearchDate] = useState(null);
   const [business, setBusiness] = useState(null);
   const [events, setEvents] = useState([]);
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     getEventList();
-  }, [id, searchDate])
+  }, [id, searchDate]);
+
+  
+  useEffect(() => {
+    if(id && user){
+      getRole();
+    }
+  }, [id, user])
 
   useEffect(() => {
     getBusinessById(id)
@@ -25,9 +34,24 @@ const BusinessProfile = () => {
         setBusiness(res.data.business);
       })
       .catch((e) => {
-        console.error("Error fetching user data:", e);
+        console.error("Error fetching business data:", e);
       });
   }, [id]);
+
+  
+  useEffect(()=>{
+  }, []);
+
+  
+  function getRole(){
+    getUserRoleInBusiness(user?._id, id)?.then((res) => {
+      setUserRole(res.data.role)
+    })
+    .catch((e)=>{
+      console.error("Error fetching business data:", e);
+    })
+  }
+  
 
   function getEventList(){
     if(searchDate === null) return;
@@ -52,7 +76,7 @@ const BusinessProfile = () => {
       </div>
       <div className="business-profile__calendar">
         <BusinessContext.Provider value={{ business, user }}>
-          <CalendarLayout events={events} setSearchDate={setSearchDate} submitEventCallback={getEventList}/>
+          <CalendarLayout events={events} setSearchDate={setSearchDate} submitEventCallback={getEventList} currentUserRole={userRole}/>
         </BusinessContext.Provider>
       </div>
     </main>

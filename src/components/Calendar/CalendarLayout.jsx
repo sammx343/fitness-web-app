@@ -1,6 +1,7 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState, createContext} from "react";
 import CalendarEventModal from "./CalendarEventModal";
 import { daysOfTheWeekSpanish, daysOfWeek } from "../../utils/dateUtils";
+import { useAuth } from "../../auth/AuthContext";
 import "./CalendarLayout.scss";
 
 const hours = Array.from({ length: 24 }, (_, i) =>
@@ -12,7 +13,12 @@ const EVENT_MINUTES_SIZE_SMALL = 20;
 const EVENT_MINUTES_SIZE_MEDIUM = 30;
 const currentDate = new Date();
 
-const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
+const CalendarLayout = ({ events, setSearchDate, submitEventCallback, currentUserRole }) => {
+  const RoleContext = createContext('role');
+  const BusinessContext = createContext('business');
+  
+  const { user } = useAuth();
+
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
@@ -302,8 +308,6 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
   }
 
   function hourClick(event, dayIndex, hour) {
-    // event.target.style.backgroundColor = "red";
-
     setClickedEvent(null);
 
     const offsetY = event.nativeEvent.offsetY;
@@ -376,14 +380,19 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
       </div>
       {createWeekLayout}
       {shouldOpenModal && (
-        <CalendarEventModal
-          setShouldOpenModal={setShouldOpenModal}
-          submitEventCallback={submitEventCallback}
-          clickedHourDate={clickedHourDate}
-          endHourDate={endHourDate}
-          event={clickedEvent}
-        />
+        
+        <RoleContext.Provider value={currentUserRole}>
+          <CalendarEventModal
+            setShouldOpenModal={setShouldOpenModal}
+            submitEventCallback={submitEventCallback}
+            clickedHourDate={clickedHourDate}
+            endHourDate={endHourDate}
+            event={clickedEvent}
+          />
+        </RoleContext.Provider>
       )}
+      
+      <h1>{currentUserRole}</h1>
     </div>
   );
 };
