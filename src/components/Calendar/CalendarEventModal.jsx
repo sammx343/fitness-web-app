@@ -2,7 +2,7 @@ import React from "react";
 import "./CalendarEventModal.scss";
 import EventForm from "./EventForm";
 
-const CalendarEventModal = ({ setShouldOpenModal, clickedHourDate, endHourDate, submitEventCallback, event}) => {
+const CalendarEventModal = ({ setShouldOpenModal, clickedHourDate, endHourDate, submitEventCallback, event, eventModalContent}) => {
   return (
     <div className="calendar-event-modal">
       <div
@@ -11,10 +11,7 @@ const CalendarEventModal = ({ setShouldOpenModal, clickedHourDate, endHourDate, 
       ></div>
       <div className="calendar-event-modal__content">
         <h1>Calendar Event Modal</h1>
-        <EventForm clickedHourDate={clickedHourDate} endHourDate={endHourDate} event={event} submitEventCallback={() => {
-          submitEventCallback();
-          setShouldOpenModal(false)
-        }} />
+        {eventModalContent}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useContext } from "react";
 import CustomTimePicker from "./CustomTimePicker";
 import { daysOfTheWeekSpanish, parseTimeString } from "../../utils/dateUtils";
 import { createEvent, editEvent, deleteEvent} from "../../services/events";
-import { BusinessContext } from "../../pages/BusinessProfile";
+import { BusinessContext } from "../../components/Calendar/CalendarLayout";
 import "./EventForm.scss";
 
 const hours = [];

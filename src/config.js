@@ -4,4 +4,9 @@ const config = {
   apiUrl: `${apiBaseUrl}`,
 };
 
-export default config;
+const businessRoles = {
+  owner: 'owner',
+  student: 'student'
+}
+
+export {config, businessRoles};

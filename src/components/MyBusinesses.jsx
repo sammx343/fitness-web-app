@@ -7,7 +7,7 @@ const MyBusinesses = ({ businessList }) => {
     <div>
       <h2>Mi lista de negocios</h2>
       <ul>
-        {businessList.length === 0 && <p>Loading ...</p>}
+        {businessList.length === 0 && <p>No businesses available ...</p>}
         {businessList.length > 0 &&
           businessList.map((business) => {
             return (
