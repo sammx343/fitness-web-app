@@ -17,10 +17,6 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const getUserRole = () => {
-    return user?.rol;
-  };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");

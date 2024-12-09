@@ -1,6 +1,8 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState, createContext} from "react";
 import CalendarEventModal from "./CalendarEventModal";
 import { daysOfTheWeekSpanish, daysOfWeek } from "../../utils/dateUtils";
+import { useAuth } from "../../auth/AuthContext";
+import EventForm from "./EventForm";
 import "./CalendarLayout.scss";
 
 const hours = Array.from({ length: 24 }, (_, i) =>
@@ -11,8 +13,13 @@ const MINUTES_A_DAY = 60 * 24;
 const EVENT_MINUTES_SIZE_SMALL = 20;
 const EVENT_MINUTES_SIZE_MEDIUM = 30;
 const currentDate = new Date();
+const RoleContext = createContext('role');
+const BusinessContext = createContext('business');
 
-const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
+const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, currentUserRole }) => {
+  
+  const { user } = useAuth();
+
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
   const [currentYears, setCurrentYears] = useState([]);
   const [currentMonths, setCurrentMonths] = useState([]);
@@ -302,8 +309,6 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
   }
 
   function hourClick(event, dayIndex, hour) {
-    // event.target.style.backgroundColor = "red";
-
     setClickedEvent(null);
 
     const offsetY = event.nativeEvent.offsetY;
@@ -339,6 +344,18 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
     setCurrentWeek(currentWeek + addWeek);
   }
 
+  function getEventModalContentAccordingToUserRole(){
+    if(currentUserRole === 'owner'){
+      return (
+        <EventForm clickedHourDate={clickedHourDate} endHourDate={endHourDate} event={clickedEvent} submitEventCallback={() => {
+          submitEventCallback();
+          setShouldOpenModal(false)
+        }}/>
+      )
+    } else {
+      return (<h1>Estudiante</h1>)
+    }
+  }
   const renderDayHeader = (day, index) => {
     const targetDay = getDateOfWeekDay(index);
     const isToday =
@@ -376,16 +393,25 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback }) => {
       </div>
       {createWeekLayout}
       {shouldOpenModal && (
-        <CalendarEventModal
-          setShouldOpenModal={setShouldOpenModal}
-          submitEventCallback={submitEventCallback}
-          clickedHourDate={clickedHourDate}
-          endHourDate={endHourDate}
-          event={clickedEvent}
-        />
+        <BusinessContext.Provider value={{ business, user }}>
+          <RoleContext.Provider value={currentUserRole}>
+            <CalendarEventModal
+              setShouldOpenModal={setShouldOpenModal}
+              submitEventCallback={submitEventCallback}
+              clickedHourDate={clickedHourDate}
+              endHourDate={endHourDate}
+              event={clickedEvent}
+              eventModalContent={
+                getEventModalContentAccordingToUserRole()
+              }
+            />
+          </RoleContext.Provider>
+        </BusinessContext.Provider>
       )}
+      
+      <h1>{currentUserRole}</h1>
     </div>
   );
 };
 
-export default CalendarLayout;
+export {CalendarLayout, RoleContext, BusinessContext};
