@@ -408,8 +408,6 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, 
           </RoleContext.Provider>
         </BusinessContext.Provider>
       )}
-      
-      <h1>{currentUserRole}</h1>
     </div>
   );
 };

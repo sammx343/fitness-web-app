@@ -14,11 +14,11 @@ const BusinessProfile = () => {
   const [business, setBusiness] = useState(null);
   const [events, setEvents] = useState([]);
   const [userRole, setUserRole] = useState('');
+  const [tabNumber, setTabNumber] = useState(0)
 
   useEffect(() => {
     getEventList();
   }, [id, searchDate]);
-
   
   useEffect(() => {
     if(id && user){
@@ -36,8 +36,9 @@ const BusinessProfile = () => {
       });
   }, [id]);
 
-  useEffect(()=>{
-  }, []);
+  function changeTab(tabNumber){
+    setTabNumber(tabNumber);
+  }
   
   function getRole(){
     getUserRoleInBusiness(user?._id, id)?.then((res) => {
@@ -69,13 +70,31 @@ const BusinessProfile = () => {
         <p>Direccion: {business.address}</p>
         <p>Email: {business.email}</p>
       </div>
-      <div className="business-profile__calendar">
-          <CalendarLayout 
-            events={events}
-            business={business}
-            setSearchDate={setSearchDate} 
-            submitEventCallback={getEventList} 
-            currentUserRole={userRole}/>
+      <div className="business-profile__tabs">
+        <div className="business-profile__tabs--titles">
+          <button onClick={()=>changeTab(0)}><h3>Calendario</h3></button>
+          <button onClick={()=>changeTab(1)}><h3>Subscripciones</h3></button>
+        </div>
+        {tabNumber === 0 && 
+          <div className="business-profile__tab-content--1">
+            <div className="business-profile__calendar">
+                <CalendarLayout 
+                  events={events}
+                  business={business}
+                  setSearchDate={setSearchDate} 
+                  submitEventCallback={getEventList} 
+                  currentUserRole={userRole}/>
+            </div>
+          </div>
+        }
+        {tabNumber === 1 && 
+          <div className="business-profile__tab.content--2">
+            <div className="business-profile__subscriptions">
+                <h2>Subscripciones</h2>
+                <p>Coming soon...</p>
+            </div>
+          </div>
+        }
       </div>
     </main>
   );
