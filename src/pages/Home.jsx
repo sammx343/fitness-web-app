@@ -1,6 +1,4 @@
 import React from "react";
-import StudentsHome from "../components/StudentsHome";
-import TeachersHome from "../components/TeachersHome";
 import { getTeacherBusinesses } from "../services/teachers";
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
@@ -29,7 +27,6 @@ const Home = () => {
   return (
     <div>
       <h1> Home </h1>
-      {user?.role === "student" && <StudentsHome />}
       <div>
         <MySubscriptions />
         <BusinessList />
