@@ -38,6 +38,8 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
   const [endHour, setEndHour] = useState(parsedClickedHourDate(endHourDate));
   const [place, setPlace] = useState(event?.place || "");
   const [isWeekly, setIsWeekly] = useState(event?.isWeekly || false);
+  const [maxCapacity, setMaxCapacity] = useState(event?.maxCapacity || 10);
+  const [openToAll, setOpenToAll] = useState(event?.openToAll || false);
   const [errors, setErrors] = useState({});
 
   //Adds an extra day to the current date in the case the initial hour is bigger than the end date
@@ -113,7 +115,9 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
       place,
       isWeekly,
       userId: user._id,
-      businessId: business._id
+      businessId: business._id,
+      maxCapacity,
+      openToAll
     };
 
     if (!validateForm()) return;
@@ -126,6 +130,8 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
       setPlace("");
       setIsWeekly(false);
       setErrors({});
+      setOpenToAll(false);
+      setMaxCapacity(10);
       submitEventCallback();
     }).catch(error => {
       console.log(error);
@@ -201,6 +207,18 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
         </div>
       </div>
       <div className="input-group">
+        <label htmlFor="max_capacity">Cupos máximos:</label>
+        <div className="input-group__right">
+          <input
+            type="number"
+            id="max_capacity"
+            value={maxCapacity}
+            onChange={(e) => setMaxCapacity(e.target.value)}
+          />
+        </div>
+      </div>
+      <span><small>(Al dejarse vacío, los cupos máximos para asistir serán ilimitados.)</small> </span>
+      <div className="input-group">
         <label>
           Evento Semanal
         </label>
@@ -211,6 +229,18 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
           onChange={(e) => setIsWeekly(e.target.checked)}
         />
       </div>
+      <div className="input-group">
+        <label>
+          Abierto a todos:
+        </label>
+        <input
+          type="checkbox"
+          id="openToAll"
+          checked={openToAll}
+          onChange={(e) => setOpenToAll(e.target.checked)}
+        />
+      </div>
+      <span><small>(Cualquier persona, así no tenga subscripción, podrá subscribirse al evento)</small> </span>
       <button type="button" onClick={(event) => handleSubmit(event)}>
         { event && 'Editar Evento'} 
         { !event && 'Crear Evento'} 
