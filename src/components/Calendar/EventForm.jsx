@@ -70,13 +70,6 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
     return time;
   }
 
-  function createClickedHourDateEnd(date) {
-    const newHours = new Date(date)
-    newHours.setHours(date.getHours() + 1);
-
-    return parsedClickedHourDate(newHours)
-  }
-
   const validateForm = () => {
     let hasErrors = false;
     const newErrors = {};

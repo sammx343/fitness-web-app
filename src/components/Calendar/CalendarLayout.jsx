@@ -3,6 +3,7 @@ import CalendarEventModal from "./CalendarEventModal";
 import { daysOfTheWeekSpanish, daysOfWeek } from "../../utils/dateUtils";
 import { useAuth } from "../../auth/AuthContext";
 import EventForm from "./EventForm";
+import { EventCard } from "./EventCard";
 import "./CalendarLayout.scss";
 
 const hours = Array.from({ length: 24 }, (_, i) =>
@@ -17,7 +18,6 @@ const RoleContext = createContext('role');
 const BusinessContext = createContext('business');
 
 const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, currentUserRole }) => {
-  
   const { user } = useAuth();
 
   const [monthsYearsHeader, setMonthsYearsHeader] = useState("");
@@ -309,6 +309,8 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, 
   }
 
   function hourClick(event, dayIndex, hour) {
+    if(currentUserRole !== 'owner') return;
+
     setClickedEvent(null);
 
     const offsetY = event.nativeEvent.offsetY;
@@ -353,7 +355,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, 
         }}/>
       )
     } else {
-      return (<h1>Estudiante</h1>)
+      return (<EventCard event={clickedEvent}></EventCard>)
     }
   }
   const renderDayHeader = (day, index) => {
