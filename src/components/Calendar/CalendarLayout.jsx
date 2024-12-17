@@ -355,7 +355,7 @@ const CalendarLayout = ({ events, setSearchDate, submitEventCallback, business, 
         }}/>
       )
     } else {
-      return (<EventCard event={clickedEvent}></EventCard>)
+      return (<EventCard event={clickedEvent} user={user}></EventCard>)
     }
   }
   const renderDayHeader = (day, index) => {

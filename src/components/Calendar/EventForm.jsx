@@ -38,7 +38,7 @@ function EventForm({ clickedHourDate, endHourDate, submitEventCallback, event}) 
   const [endHour, setEndHour] = useState(parsedClickedHourDate(endHourDate));
   const [place, setPlace] = useState(event?.place || "");
   const [isWeekly, setIsWeekly] = useState(event?.isWeekly || false);
-  const [maxCapacity, setMaxCapacity] = useState(event?.maxCapacity || 10);
+  const [maxCapacity, setMaxCapacity] = useState(event?.maxCapacity || 0);
   const [openToAll, setOpenToAll] = useState(event?.openToAll || false);
   const [errors, setErrors] = useState({});
 
